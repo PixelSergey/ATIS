@@ -4,12 +4,12 @@
 #include <map>
 
 #include "AudioFileSourcePROGMEM.h"
-#include "AudioGeneratorWAV.h"
+#include "AudioGeneratorMP3.h"
 #include "AudioOutputI2SNoDAC.h"
 
 #include "audio.h"
 
-AudioGeneratorWAV *wav;
+AudioGeneratorMP3 *aud;
 AudioOutputI2SNoDAC *out;
 std::map<std::string, AudioFileSourcePROGMEM*> vox;
 
@@ -20,22 +20,22 @@ int pos;
 void setup() {
   delay(1000);
 
-  vox["A"] = new AudioFileSourcePROGMEM(A_wav, A_wav_len);
-  vox["B"] = new AudioFileSourcePROGMEM(B_wav, B_wav_len);
+  vox["A"] = new AudioFileSourcePROGMEM(A_mp3, A_mp3_len);
+  vox["B"] = new AudioFileSourcePROGMEM(B_mp3, B_mp3_len);
   out = new AudioOutputI2SNoDAC();
-  wav = new AudioGeneratorWAV();
+  aud = new AudioGeneratorMP3();
 
   phrase = {"A", "B"};
   pos = 0;
 }
 
 void loop() {
-  if (wav->isRunning()) {
-    if (!wav->loop()) wav->stop();
+  if (aud->isRunning()) {
+    if (!aud->loop()) aud->stop();
   } else {
     if (pos<phrase.size()) {
       delay(200);
-      wav->begin(vox[phrase[pos]], out);
+      aud->begin(vox[phrase[pos]], out);
       pos++;
     } else {
       delay(1000);
