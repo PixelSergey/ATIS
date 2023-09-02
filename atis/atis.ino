@@ -1,13 +1,22 @@
-#include <Arduino.h>
-#include <string>
-#include <vector>
-#include <map>
+/**    
+ *  ATIS main program file.
+ *  Copyright (C) 2023 PixelSergey
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-#include "AudioFileSourcePROGMEM.h"
-#include "AudioGeneratorMP3.h"
-#include "AudioOutputI2SNoDAC.h"
-
-#include "audio.h"
+#include "config.h"
 
 AudioGeneratorMP3 *aud;
 AudioOutputI2SNoDAC *out;
@@ -28,6 +37,11 @@ void loadAudio() {
 
 
 void setup() {
+  // Pin setup
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, HIGH);
+
+  // Audio setup
   delay(1000);
 
   out = new AudioOutputI2SNoDAC();
@@ -35,6 +49,7 @@ void setup() {
 
   loadAudio();
 
+  // Phrase setup - will be replaced by automated report
   int time = millis();
   phrase = {"THIS_IS", "KUMPULA", "INFORMATION", time%3==0 ? "A" : (time%3==1 ? "B" : "C")};
   pos = 0;
@@ -48,6 +63,7 @@ void loop() {
       aud->begin(vox[phrase[pos]], out);
       pos++;
     } else {
+      digitalWrite(LED, LOW);
       delay(1000);
     }
   }
