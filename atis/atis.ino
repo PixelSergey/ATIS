@@ -38,11 +38,22 @@ void loadAudio() {
 
 void setup() {
   // Pin setup
+
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
 
+  // WiFi setup
+
+  // The WiFiManager class is rather heavy. This creates a scope for the variable,
+  // which is destroyed when it properly sets up the WiFi connection
+  {
+      WiFiManager wifiManager;
+      wifiManager.autoConnect("ATIS");
+  }
+
+  digitalWrite(LED, LOW);
+
   // Audio setup
-  delay(1000);
 
   out = new AudioOutputI2SNoDAC();
   aud = new AudioGeneratorMP3();
@@ -50,10 +61,12 @@ void setup() {
   loadAudio();
 
   // Phrase setup - will be replaced by automated report
+
   int time = millis();
   phrase = {"THIS_IS", "KUMPULA", "INFORMATION", time%3==0 ? "A" : (time%3==1 ? "B" : "C")};
   pos = 0;
 }
+
 
 void loop() {
   if (aud->isRunning()) {

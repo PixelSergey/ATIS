@@ -22,6 +22,8 @@
 #include <vector>
 #include <map>
 
+#include <WiFiManager.h>
+
 #include "AudioFileSourcePROGMEM.h"
 #include "AudioGeneratorMP3.h"
 #include "AudioOutputI2SNoDAC.h"
