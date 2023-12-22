@@ -18,7 +18,6 @@
 
 #include "config.h"
 #include "helper.h"
-#include "audio.h"
 
 void playClip(const unsigned char* data, unsigned int length){
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
@@ -31,30 +30,14 @@ void playClip(const unsigned char* data, unsigned int length){
 }
 
 void say(std::string token){
-    if(token == "A"){
-        playClip(A_mp3, A_mp3_len);
+    auto it = tokenToClip.find(token);
+    if(it == tokenToClip.end()){
         return;
     }
-    if(token == "B"){
-        playClip(B_mp3, B_mp3_len);
-        return;
-    }
-    if(token == "C"){
-        playClip(C_mp3, C_mp3_len);
-        return;
-    }
-    if(token == "THIS_IS"){
-        playClip(THIS_IS_mp3, THIS_IS_mp3_len);
-        return;
-    }
-    if(token == "KUMPULA"){
-        playClip(KUMPULA_mp3, KUMPULA_mp3_len);
-        return;
-    }
-    if(token == "INFORMATION"){
-        playClip(INFORMATION_mp3, INFORMATION_mp3_len);
-        return;
-    }
+
+    const unsigned char* data = it->second.first;
+    unsigned int length = it->second.second;
+    playClip(data, length);
 }
 
 std::string getMetar(){

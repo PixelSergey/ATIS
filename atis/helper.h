@@ -20,6 +20,8 @@
 #ifndef ATIS_HELPER
 #define ATIS_HELPER
 
+// Enable or disable debug printing and serial features
+
 #if DEBUG
     #define D_SerialBegin(...)  Serial.begin(__VA_ARGS__)
     #define D_print(...)        Serial.print(__VA_ARGS__)
@@ -31,6 +33,8 @@
     #define D_write(...)
     #define D_println(...)
 #endif
+
+// Includes
 
 #include <string>
 #include <vector>
@@ -46,5 +50,19 @@
 #include "AudioFileSourcePROGMEM.h"
 #include "AudioGeneratorMP3.h"
 #include "AudioOutputI2SNoDAC.h"
+
+// Audio include
+
+#include "audio.h"
+
+// This map must be updated if audio files are added or removed
+std::map<std::string, std::pair<const unsigned char*, unsigned int>> tokenToClip = {
+    {"A", {A_mp3, A_mp3_len}},
+    {"B", {B_mp3, B_mp3_len}},
+    {"C", {C_mp3, C_mp3_len}},
+    {"THIS_IS", {THIS_IS_mp3, THIS_IS_mp3_len}},
+    {"KUMPULA", {KUMPULA_mp3, KUMPULA_mp3_len}},
+    {"INFORMATION", {INFORMATION_mp3, INFORMATION_mp3_len}},
+};
 
 #endif
