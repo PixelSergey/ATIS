@@ -39,6 +39,8 @@ void loadAudio() {
 void setup() {
   // Pin setup
 
+  Serial.begin(115200);
+  
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
 
@@ -50,6 +52,25 @@ void setup() {
       WiFiManager wifiManager;
       wifiManager.autoConnect("ATIS");
   }
+
+  // Data retrieval from ilmailusää service
+
+  std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+  client->setInsecure();
+  HTTPClient https;
+
+  https.begin(*client, URL);
+  int responseCode = https.GET();
+
+  if(responseCode <= 0){
+    Serial.println("Error in HTTPS request");
+    return;
+  }
+  Serial.print("Response code:");
+  Serial.println(responseCode);
+  Serial.println(https.getString());
+
+  https.end();
 
   digitalWrite(LED, LOW);
 

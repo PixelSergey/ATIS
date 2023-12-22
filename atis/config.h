@@ -23,6 +23,9 @@
 #include <map>
 
 #include <WiFiManager.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecureBearSSL.h>
 
 #include "AudioFileSourcePROGMEM.h"
 #include "AudioGeneratorMP3.h"
@@ -32,6 +35,9 @@
 #define ATIS_CONFIG
 
 #define LED D7
+
+#define URL "https://ilmailusaa.fi/backend.php?{%22mode%22:%22awsaviation%22,%22radius%22:%22100%22,%22points%22:[{%22_locationName%22:%22ILZD%22}]}"
+
 #include "audio.h"
 
 #endif
