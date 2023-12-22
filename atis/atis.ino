@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include "helper.h"
+#include "audio.h"
 
 void playClip(const unsigned char* data, unsigned int length){
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
