@@ -1,4 +1,4 @@
-/**    
+/**
  *  ATIS configuration file. This file may be edited to change,
  *  for example, pin assignments and other details.
  *  Copyright (C) 2023 PixelSergey

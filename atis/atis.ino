@@ -1,4 +1,4 @@
-/**    
+/**
  *  ATIS main program file.
  *  Copyright (C) 2023 PixelSergey
  *
@@ -20,86 +20,84 @@
 
 AudioGeneratorMP3 *aud;
 AudioOutputI2SNoDAC *out;
-std::map<std::string, AudioFileSourcePROGMEM*> vox;
+std::map<std::string, AudioFileSourcePROGMEM *> vox;
 
 std::vector<std::string> phrase;
 int pos;
 
-
-void loadAudio() {
-  vox["A"] = new AudioFileSourcePROGMEM(A_mp3, A_mp3_len);
-  vox["B"] = new AudioFileSourcePROGMEM(B_mp3, B_mp3_len);
-  vox["C"] = new AudioFileSourcePROGMEM(C_mp3, C_mp3_len);
-  vox["THIS_IS"] = new AudioFileSourcePROGMEM(THIS_IS_mp3, THIS_IS_mp3_len);
-  vox["KUMPULA"] = new AudioFileSourcePROGMEM(KUMPULA_mp3, KUMPULA_mp3_len);
-  vox["INFORMATION"] = new AudioFileSourcePROGMEM(INFORMATION_mp3, INFORMATION_mp3_len);
+void loadAudio(){
+    vox["A"] = new AudioFileSourcePROGMEM(A_mp3, A_mp3_len);
+    vox["B"] = new AudioFileSourcePROGMEM(B_mp3, B_mp3_len);
+    vox["C"] = new AudioFileSourcePROGMEM(C_mp3, C_mp3_len);
+    vox["THIS_IS"] = new AudioFileSourcePROGMEM(THIS_IS_mp3, THIS_IS_mp3_len);
+    vox["KUMPULA"] = new AudioFileSourcePROGMEM(KUMPULA_mp3, KUMPULA_mp3_len);
+    vox["INFORMATION"] = new AudioFileSourcePROGMEM(INFORMATION_mp3, INFORMATION_mp3_len);
 }
 
+void setup(){
+    // Pin setup
 
-void setup() {
-  // Pin setup
+    Serial.begin(115200);
 
-  Serial.begin(115200);
-  
-  pinMode(LED, OUTPUT);
-  digitalWrite(LED, HIGH);
+    pinMode(LED, OUTPUT);
+    digitalWrite(LED, HIGH);
 
-  // WiFi setup
+    // WiFi setup
 
-  // The WiFiManager class is rather heavy. This creates a scope for the variable,
-  // which is destroyed when it properly sets up the WiFi connection
-  {
-      WiFiManager wifiManager;
-      wifiManager.autoConnect("ATIS");
-  }
-
-  // Data retrieval from ilmailusää service
-
-  std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
-  client->setInsecure();
-  HTTPClient https;
-
-  https.begin(*client, URL);
-  int responseCode = https.GET();
-
-  if(responseCode <= 0){
-    Serial.println("Error in HTTPS request");
-    return;
-  }
-  Serial.print("Response code:");
-  Serial.println(responseCode);
-  Serial.println(https.getString());
-
-  https.end();
-
-  digitalWrite(LED, LOW);
-
-  // Audio setup
-
-  out = new AudioOutputI2SNoDAC();
-  aud = new AudioGeneratorMP3();
-
-  loadAudio();
-
-  // Phrase setup - will be replaced by automated report
-
-  int time = millis();
-  phrase = {"THIS_IS", "KUMPULA", "INFORMATION", time%3==0 ? "A" : (time%3==1 ? "B" : "C")};
-  pos = 0;
-}
-
-
-void loop() {
-  if (aud->isRunning()) {
-    if (!aud->loop()) aud->stop();
-  } else {
-    if (pos<phrase.size()) {
-      aud->begin(vox[phrase[pos]], out);
-      pos++;
-    } else {
-      digitalWrite(LED, LOW);
-      delay(1000);
+    // The WiFiManager class is rather heavy. This creates a scope for the variable,
+    // which is destroyed when it properly sets up the WiFi connection
+    {
+        WiFiManager wifiManager;
+        wifiManager.autoConnect("ATIS");
     }
-  }
+
+    // Data retrieval from ilmailusää service
+
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setInsecure();
+    HTTPClient https;
+
+    https.begin(*client, URL);
+    int responseCode = https.GET();
+
+    if (responseCode <= 0){
+        Serial.println("Error in HTTPS request");
+        return;
+    }
+    Serial.print("Response code:");
+    Serial.println(responseCode);
+    Serial.println(https.getString());
+
+    https.end();
+
+    digitalWrite(LED, LOW);
+
+    // Audio setup
+
+    out = new AudioOutputI2SNoDAC();
+    aud = new AudioGeneratorMP3();
+
+    loadAudio();
+
+    // Phrase setup - will be replaced by automated report
+
+    int time = millis();
+    phrase = {"THIS_IS", "KUMPULA", "INFORMATION", time % 3 == 0 ? "A" : (time % 3 == 1 ? "B" : "C")};
+    pos = 0;
 }
 
+void loop(){
+    if (aud->isRunning()){
+        if (!aud->loop())
+            aud->stop();
+    }
+    else{
+        if (pos < phrase.size()){
+            aud->begin(vox[phrase[pos]], out);
+            pos++;
+        }else{
+            digitalWrite(LED, LOW);
+            delay(1000);
+        }
+    }
+}
