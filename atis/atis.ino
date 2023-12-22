@@ -20,7 +20,7 @@
 
 AudioGeneratorMP3 *aud;
 AudioOutputI2SNoDAC *out;
-std::map<std::string, AudioFileSourcePROGMEM *> vox;
+std::map<std::string, AudioFileSourcePROGMEM*> vox;
 
 std::vector<std::string> phrase;
 int pos;
@@ -37,7 +37,7 @@ void loadAudio(){
 void setup(){
     // Pin setup
 
-    Serial.begin(115200);
+    D_SerialBegin(115200);
 
     pinMode(LED, OUTPUT);
     digitalWrite(LED, HIGH);
@@ -60,15 +60,24 @@ void setup(){
     https.begin(*client, URL);
     int responseCode = https.GET();
 
-    if (responseCode <= 0){
-        Serial.println("Error in HTTPS request");
+    if(responseCode <= 0){
+        D_println("Error in HTTPS request");
         return;
     }
-    Serial.print("Response code:");
-    Serial.println(responseCode);
-    Serial.println(https.getString());
 
+    String response = https.getString();
     https.end();
+
+    StaticJsonDocument<384> doc;
+    DeserializationError error = deserializeJson(doc, response);
+    if(error){
+        D_print("Error deserialising JSON: ");
+        D_println(error.f_str());
+        return;
+    }
+
+    String message = doc.as<JsonObject>().begin()->value()["p1"].as<String>();
+    D_println(message);
 
     digitalWrite(LED, LOW);
 
@@ -87,9 +96,8 @@ void setup(){
 }
 
 void loop(){
-    if (aud->isRunning()){
-        if (!aud->loop())
-            aud->stop();
+    if(aud->isRunning()){
+        if (!aud->loop()) aud->stop();
     }else{
         if (pos < phrase.size()){
             aud->begin(vox[phrase[pos]], out);
