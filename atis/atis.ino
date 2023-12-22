@@ -18,20 +18,44 @@
 
 #include "config.h"
 
-AudioGeneratorMP3 *aud;
-AudioOutputI2SNoDAC *out;
-std::map<std::string, AudioFileSourcePROGMEM*> vox;
-
 std::vector<std::string> phrase;
 int pos;
 
-void loadAudio(){
-    vox["A"] = new AudioFileSourcePROGMEM(A_mp3, A_mp3_len);
-    vox["B"] = new AudioFileSourcePROGMEM(B_mp3, B_mp3_len);
-    vox["C"] = new AudioFileSourcePROGMEM(C_mp3, C_mp3_len);
-    vox["THIS_IS"] = new AudioFileSourcePROGMEM(THIS_IS_mp3, THIS_IS_mp3_len);
-    vox["KUMPULA"] = new AudioFileSourcePROGMEM(KUMPULA_mp3, KUMPULA_mp3_len);
-    vox["INFORMATION"] = new AudioFileSourcePROGMEM(INFORMATION_mp3, INFORMATION_mp3_len);
+void playClip(const unsigned char* data, unsigned int length){
+    AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
+    AudioGeneratorMP3* aud = new AudioGeneratorMP3();
+
+    AudioFileSourcePROGMEM* clip = new AudioFileSourcePROGMEM(data, length);
+    aud->begin(clip, out);
+    while(aud->loop());
+    aud->stop();
+}
+
+void say(std::string token){
+    if(token == "A"){
+        playClip(A_mp3, A_mp3_len);
+        return;
+    }
+    if(token == "B"){
+        playClip(B_mp3, B_mp3_len);
+        return;
+    }
+    if(token == "C"){
+        playClip(C_mp3, C_mp3_len);
+        return;
+    }
+    if(token == "THIS_IS"){
+        playClip(THIS_IS_mp3, THIS_IS_mp3_len);
+        return;
+    }
+    if(token == "KUMPULA"){
+        playClip(KUMPULA_mp3, KUMPULA_mp3_len);
+        return;
+    }
+    if(token == "INFORMATION"){
+        playClip(INFORMATION_mp3, INFORMATION_mp3_len);
+        return;
+    }
 }
 
 std::string getMetar(){
@@ -83,18 +107,24 @@ std::vector<std::string> parseMetar(std::string metar){
     return parsed;
 }
 
+std::vector<std::string> generatePhrase(){
+    std::vector<std::string> result;
+
+    int time = millis();
+    result = {"THIS_IS", "KUMPULA", "INFORMATION", time % 3 == 0 ? "A" : (time % 3 == 1 ? "B" : "C")};
+
+    return result;
+}
+
 void setup(){
     // Pin setup
-
+    pinMode(LED, OUTPUT);
+    digitalWrite(LED, HIGH);  // Turn on setup light
     D_SerialBegin(115200);
 
-    pinMode(LED, OUTPUT);
-    digitalWrite(LED, HIGH);
-
     // WiFi setup
-
-    // The WiFiManager class is rather heavy. This creates a scope for the variable,
-    // which is destroyed when it properly sets up the WiFi connection
+    // The WiFiManager class is rather heavy.
+    // These brackets create a scope for wifiManager: the object is destroyed after a connection is established.
     {
         WiFiManager wifiManager;
         wifiManager.autoConnect("ATIS");
@@ -104,32 +134,21 @@ void setup(){
     std::string metar = getMetar();
     std::vector<std::string> parsed = parseMetar(metar);
 
-    digitalWrite(LED, LOW);
-
     // Audio setup
-
-    out = new AudioOutputI2SNoDAC();
-    aud = new AudioGeneratorMP3();
-
-    loadAudio();
-
-    // Phrase setup - will be replaced by automated report
-
-    int time = millis();
-    phrase = {"THIS_IS", "KUMPULA", "INFORMATION", time % 3 == 0 ? "A" : (time % 3 == 1 ? "B" : "C")};
+    phrase = generatePhrase();
     pos = 0;
+
+    // Turn off setup light
+    digitalWrite(LED, LOW);
 }
 
 void loop(){
-    if(aud->isRunning()){
-        if(!aud->loop()) aud->stop();
+    if(pos < phrase.size()){
+        say(phrase[pos]);
+        pos++;
     }else{
-        if(pos < phrase.size()){
-            aud->begin(vox[phrase[pos]], out);
-            pos++;
-        }else{
-            digitalWrite(LED, LOW);
-            delay(1000);
-        }
+        phrase = generatePhrase();
+        pos = 0;
+        delay(1000);
     }
 }
