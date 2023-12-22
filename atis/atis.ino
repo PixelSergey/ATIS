@@ -90,8 +90,7 @@ void loop(){
     if (aud->isRunning()){
         if (!aud->loop())
             aud->stop();
-    }
-    else{
+    }else{
         if (pos < phrase.size()){
             aud->begin(vox[phrase[pos]], out);
             pos++;
