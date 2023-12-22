@@ -18,9 +18,6 @@
 
 #include "config.h"
 
-std::vector<std::string> phrase;
-int pos;
-
 void playClip(const unsigned char* data, unsigned int length){
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
     AudioGeneratorMP3* aud = new AudioGeneratorMP3();
@@ -71,27 +68,36 @@ std::string getMetar(){
         return "Error";
     }
 
-    String response = https.getString();
+    std::string response = std::string(https.getString().c_str());
     https.end();
 
-    StaticJsonDocument<384> doc;
-    DeserializationError error = deserializeJson(doc, response);
+    D_println("Response:");
+    D_println(response.c_str());
+
+    return response;
+}
+
+std::string decodeMetar(std::string metar){
+    StaticJsonDocument<384> jsonDocument;
+    DeserializationError error = deserializeJson(jsonDocument, metar);
     if(error){
         D_print("Error deserialising JSON: ");
         D_println(error.f_str());
         return "Error";
     }
 
-    std::string message = doc.as<JsonObject>().begin()->value()["p1"].as<std::string>();
-    D_println(message.c_str());
+    std::string decoded = jsonDocument.as<JsonObject>().begin()->value()["p1"].as<std::string>();
+    D_println("Decoded:");
+    D_println(decoded.c_str());
 
-    return message;
+    return decoded;
 }
 
 std::vector<std::string> parseMetar(std::string metar){
     std::vector<std::string> parsed;
 
-    metar.pop_back();  // Removes final = sign
+    // Remove terminating equals sign
+    metar.pop_back();
     
     // Split string on spaces
     size_t i = 0;
@@ -102,18 +108,34 @@ std::vector<std::string> parseMetar(std::string metar){
         metar.erase(0, i+1);
     }
 
+    D_println("Parsed:");
     for(std::string x : parsed) D_println(x.c_str());
 
     return parsed;
 }
 
-std::vector<std::string> generatePhrase(){
-    std::vector<std::string> result;
+std::vector<std::string> generatePhrase(std::vector<std::string> metar){
+    std::vector<std::string> phrase;
+
+    phrase.push_back("THIS_IS");
+    phrase.push_back("KUMPULA");
+    phrase.push_back("INFORMATION");
 
     int time = millis();
-    result = {"THIS_IS", "KUMPULA", "INFORMATION", time % 3 == 0 ? "A" : (time % 3 == 1 ? "B" : "C")};
+    phrase.push_back(time % 3 == 0 ? "A" : (time % 3 == 1 ? "B" : "C"));
 
-    return result;
+    D_println("Phrase:");
+    for(std::string x : phrase) D_println(x.c_str());
+
+    return phrase;
+}
+
+std::vector<std::string> getNewMetarPhrase(){
+    std::string metar = getMetar();
+    std::string decoded = decodeMetar(metar);
+    std::vector<std::string> parsed = parseMetar(decoded);
+    std::vector<std::string> phrase = generatePhrase(parsed);
+    return phrase;
 }
 
 void setup(){
@@ -124,31 +146,20 @@ void setup(){
 
     // WiFi setup
     // The WiFiManager class is rather heavy.
-    // These brackets create a scope for wifiManager: the object is destroyed after a connection is established.
+    // These curly brackets create a scope for wifiManager,
+    // so that the object is destroyed after a connection is established.
     {
         WiFiManager wifiManager;
         wifiManager.autoConnect("ATIS");
     }
-
-    // Data retrieval from ilmailusää service
-    std::string metar = getMetar();
-    std::vector<std::string> parsed = parseMetar(metar);
-
-    // Audio setup
-    phrase = generatePhrase();
-    pos = 0;
 
     // Turn off setup light
     digitalWrite(LED, LOW);
 }
 
 void loop(){
-    if(pos < phrase.size()){
-        say(phrase[pos]);
-        pos++;
-    }else{
-        phrase = generatePhrase();
-        pos = 0;
-        delay(1000);
-    }
+    std::vector<std::string> phrase = getNewMetarPhrase();
+    for(int i=0; i<phrase.size(); i++) say(phrase[i]);
+    
+    delay(2000);
 }
