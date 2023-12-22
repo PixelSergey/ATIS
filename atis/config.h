@@ -1,6 +1,12 @@
 /**
  *  ATIS configuration file. This file may be edited to change,
  *  for example, pin assignments and other details.
+ *  
+ *  The following values can be configured:
+ *  - DEBUG: Set to 1 to enable Serial and printing, 0 to disable
+ *  - LED: Change the pin that the LED is connected to
+ *  - URL: Change the URL where ATIS gets its data. Currently only ilmailusaa.fi URLs are supported. 
+ * 
  *  Copyright (C) 2023 PixelSergey
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -19,8 +25,6 @@
 
 #ifndef ATIS_CONFIG
 #define ATIS_CONFIG
-
-// Configure these values
 
 #define DEBUG 1
 #define LED D7
