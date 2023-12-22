@@ -17,48 +17,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Includes
-
-#include <Arduino.h>
-#include <string>
-#include <vector>
-#include <map>
-
-#include <WiFiManager.h>
-#include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
-#include <WiFiClientSecureBearSSL.h>
-#include <ArduinoJson.h>
-
-#include "AudioFileSourcePROGMEM.h"
-#include "AudioGeneratorMP3.h"
-#include "AudioOutputI2SNoDAC.h"
-
 #ifndef ATIS_CONFIG
 #define ATIS_CONFIG
 
 // Configure these values
 
-#define DEBUG 1  // Set to 0 in production to save space
+#define DEBUG 1
 #define LED D7
 #define URL "https://ilmailusaa.fi/backend.php?{%22mode%22:%22awsaviation%22,%22radius%22:%22100%22,%22points%22:[{%22_locationName%22:%22ILZD%22}]}"
-
-// Automatic debug print handling
-
-#if DEBUG
-    #define D_SerialBegin(...)  Serial.begin(__VA_ARGS__)
-    #define D_print(...)        Serial.print(__VA_ARGS__)
-    #define D_write(...)        Serial.write(__VA_ARGS__)
-    #define D_println(...)      Serial.println(__VA_ARGS__)
-#else
-    #define D_SerialBegin(...)
-    #define D_print(...)
-    #define D_write(...)
-    #define D_println(...)
-#endif
-
-// Audio data
-
-#include "audio.h"
 
 #endif
