@@ -34,6 +34,55 @@ void loadAudio(){
     vox["INFORMATION"] = new AudioFileSourcePROGMEM(INFORMATION_mp3, INFORMATION_mp3_len);
 }
 
+std::string getMetar(){
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setInsecure();
+    HTTPClient https;
+
+    https.begin(*client, URL);
+    int responseCode = https.GET();
+
+    if(responseCode <= 0){
+        D_println("Error in HTTPS request");
+        return "Error";
+    }
+
+    String response = https.getString();
+    https.end();
+
+    StaticJsonDocument<384> doc;
+    DeserializationError error = deserializeJson(doc, response);
+    if(error){
+        D_print("Error deserialising JSON: ");
+        D_println(error.f_str());
+        return "Error";
+    }
+
+    std::string message = doc.as<JsonObject>().begin()->value()["p1"].as<std::string>();
+    D_println(message.c_str());
+
+    return message;
+}
+
+std::vector<std::string> parseMetar(std::string metar){
+    std::vector<std::string> parsed;
+
+    metar.pop_back();  // Removes final = sign
+    
+    // Split string on spaces
+    size_t i = 0;
+    while(i != std::string::npos){
+        i = metar.find(" ");
+        std::string token = metar.substr(0, i);
+        parsed.push_back(token);
+        metar.erase(0, i+1);
+    }
+
+    for(std::string x : parsed) D_println(x.c_str());
+
+    return parsed;
+}
+
 void setup(){
     // Pin setup
 
@@ -52,32 +101,8 @@ void setup(){
     }
 
     // Data retrieval from ilmailusää service
-
-    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
-    client->setInsecure();
-    HTTPClient https;
-
-    https.begin(*client, URL);
-    int responseCode = https.GET();
-
-    if(responseCode <= 0){
-        D_println("Error in HTTPS request");
-        return;
-    }
-
-    String response = https.getString();
-    https.end();
-
-    StaticJsonDocument<384> doc;
-    DeserializationError error = deserializeJson(doc, response);
-    if(error){
-        D_print("Error deserialising JSON: ");
-        D_println(error.f_str());
-        return;
-    }
-
-    String message = doc.as<JsonObject>().begin()->value()["p1"].as<String>();
-    D_println(message);
+    std::string metar = getMetar();
+    std::vector<std::string> parsed = parseMetar(metar);
 
     digitalWrite(LED, LOW);
 
