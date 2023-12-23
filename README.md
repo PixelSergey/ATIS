@@ -31,9 +31,9 @@ The circuit contains a NodeMCU, a speaker module, and an LED.
 The speaker module is connected to +5V, and is wired to the RX port of the NodeMCU and GND via an NPN transistor.
 The RX port is used by the `AudioOutputI2SNoDAC` library to output sound.
 
-![Breadboard diagram]()
+![Breadboard diagram](/meta/ATIS_bb.png)
 
-![Circuit diagram]()
+![Schematic diagram](/meta/ATIS_shem.png)
 
 ## Credits
 
