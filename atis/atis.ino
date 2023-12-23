@@ -104,7 +104,7 @@ std::string decodeMetar(std::string metar){
 }
 
 /**
- * Splits the METAR information obtained from `decodeMetar()` into individual chunks containing one piece of information each
+ * Splits the METAR information obtained from `decodeMetar()` into individual chunks containing one piece of information each.
  * 
  * @param metar A METAR string in standard format
  * @return A vector containing the METAR information split on spaces
@@ -131,7 +131,9 @@ std::vector<std::string> parseMetar(std::string metar){
 }
 
 /**
- * Transforms the split METAR information output by `parseMetar()` into a list of tokens to be played on the speaker
+ * Transforms the split METAR information output by `parseMetar()` into a list of tokens to be played on the speaker based on the METAR standard.
+ * The official METAR standard can be found at <https://ilmailusaa.fi/pdf/Saahaitari_01-2021.pdf>.
+ * @todo Implement conversion logic. Currently, a dummy value is returned.
  * 
  * @param metar A vector of METAR information
  * @return A vector containing individual speech tokens
@@ -153,7 +155,7 @@ std::vector<std::string> generatePhrase(std::vector<std::string> metar){
 }
 
 /**
- * Combines the above functions to automatically download and convert current METAR information into a list of tokens
+ * Combines the above functions to automatically download and convert current METAR information into a list of tokens.
  * 
  * @return A vector containing the speech tokens corresponding to current METAR information
  */
@@ -166,7 +168,7 @@ std::vector<std::string> getNewMetarPhrase(){
 }
 
 /**
- * Sets up the NodeMCU's pins and WiFi connectivity
+ * Sets up the NodeMCU's pins and WiFi connectivity.
  */
 void setup(){
     // Pin setup
