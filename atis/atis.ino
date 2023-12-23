@@ -34,6 +34,10 @@ void playMp3(const unsigned char* data, unsigned int length){
     aud->begin(clip, out);
     while(aud->loop());
     aud->stop();
+
+    delete clip;
+    delete aud;
+    delete out;
 }
 
 /**
@@ -60,7 +64,7 @@ void playToken(std::string token){
  * @return The raw JSON-formatted HTTP reponse body returned by ilmailusaa.fi 
  */
 std::string getMetar(){
-    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    BearSSL::WiFiClientSecure* client = new BearSSL::WiFiClientSecure();
     client->setInsecure();
     HTTPClient https;
 
@@ -69,11 +73,12 @@ std::string getMetar(){
 
     if(responseCode <= 0){
         D_println("Error in HTTPS request");
-        return "Error";
+        return "ERROR";
     }
 
     std::string response = std::string(https.getString().c_str());
     https.end();
+    delete client;
 
     D_println("Response:");
     D_println(response.c_str());
@@ -93,7 +98,7 @@ std::string decodeMetar(std::string metar){
     if(error){
         D_print("Error deserialising JSON: ");
         D_println(error.f_str());
-        return "Error";
+        return "ERROR";
     }
 
     std::string decoded = jsonDocument.as<JsonObject>().begin()->value()["p1"].as<std::string>();
