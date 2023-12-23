@@ -1,20 +1,20 @@
 /**
- *  ATIS helper file. This file contains includes and other practical
- *  defines that would clutter up the main atis.ino file.
- *  Copyright (C) 2023 PixelSergey
+ * ATIS helper file. This file contains includes and other practical
+ * defines that would clutter up the main atis.ino file.
+ * Copyright (C) 2023 PixelSergey
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef ATIS_HELPER
@@ -34,11 +34,13 @@
     #define D_println(...)
 #endif
 
-// Includes
+// STL includes
 
 #include <string>
 #include <vector>
 #include <map>
+
+// Arduino library includes
 
 #include <Arduino.h>
 #include <WiFiManager.h>
@@ -56,7 +58,7 @@
 #include "audio.h"
 
 // This map must be updated if audio files are added or removed
-std::map<std::string, std::pair<const unsigned char*, unsigned int>> tokenToClip = {
+std::map<std::string, std::pair<const unsigned char*, unsigned int>> tokenToAudio = {
     {"A", {A_mp3, A_mp3_len}},
     {"B", {B_mp3, B_mp3_len}},
     {"C", {C_mp3, C_mp3_len}},
