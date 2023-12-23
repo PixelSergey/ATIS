@@ -33,7 +33,7 @@ The RX port is used by the `AudioOutputI2SNoDAC` library to output sound.
 
 ![Breadboard diagram](/meta/ATIS_bb.png)
 
-![Schematic diagram](/meta/ATIS_shem.png)
+![Schematic diagram](/meta/ATIS_schem.png)
 
 ## Credits
 
