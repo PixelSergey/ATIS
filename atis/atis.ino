@@ -93,6 +93,7 @@ std::string getMetar(){
  * @return A string containing the current METAR information
  */
 std::string decodeMetar(std::string metar){
+    return "ILZD 232320Z AUTO 32020G31KT 280V340 3900=";
     StaticJsonDocument<384> jsonDocument;
     DeserializationError error = deserializeJson(jsonDocument, metar);
     if(error){
@@ -146,12 +147,92 @@ std::vector<std::string> parseMetar(std::string metar){
 std::vector<std::string> generatePhrase(std::vector<std::string> metar){
     std::vector<std::string> phrase;
 
-    phrase.push_back("THIS_IS");
-    phrase.push_back("KUMPULA");
-    phrase.push_back("INFORMATION");
+    for(std::string token : metar){
+        if(token.substr(0,2) == "IL" || token.substr(0,2) == "EF"){  // Station code
+            phrase.push_back("THIS_IS");
+            if(token == "ILZD"){
+                phrase.push_back("KUMPULA");
+            }
+            phrase.push_back("INFORMATION");
+            phrase.push_back(std::vector({"A","B","C"})[rand()%3]);
+        }
+        else if(token.length()==5 && token.back()=='Z' && token.substr(0,4).find_first_not_of("0123456789")==std::string::npos){ // Time
+            phrase.push_back("AT");
+            phrase.push_back("TIME");
+            for(char number : token.substr(0,4)) phrase.push_back(std::string(1, number));
+        }
+        else if(token == "NIL"){  // No weather information
+            phrase.push_back("NO_WEATHER_INFORMATION");
+        }
+        else if(token == "AUTO"){  // Automatic weather report
+            phrase.push_back("AUTOMATIC_WEATHER_REPORT");
+        }
+        else if(token.find("KT") != std::string::npos){  // Wind
+            phrase.push_back("WIND");
 
-    int time = millis();
-    phrase.push_back(time % 3 == 0 ? "A" : (time % 3 == 1 ? "B" : "C"));
+            // Unknown winds
+            if(token == "/////KT"){
+                phrase.push_back("UNKNOWN");
+                continue;
+            }
+
+            // Wind direction
+            if(token.substr(0,3) == "VRB"){
+                phrase.push_back("VARIABLE");
+            }else{
+                for(char number : token.substr(0,3)) phrase.push_back(std::string(1, number));
+                phrase.push_back("DEGREES");
+            }
+
+            // Wind speed and gusts
+            for(char number : token.substr(3,2)) phrase.push_back(std::string(1, number));
+            phrase.push_back("KNOTS");
+            if(token.find("G") != std::string::npos){
+                phrase.push_back("GUSTING");
+                for(char number : token.substr(6,2)) phrase.push_back(std::string(1, number));
+                phrase.push_back("KNOTS");
+            }
+        }
+        else if(token.length()==7 && token[3]=='V' && token.substr(0,3).find_first_not_of("0123456789")==std::string::npos && token.substr(4,3).find_first_not_of("0123456789")==std::string::npos){  // Variable wind
+            phrase.push_back("VARIABLE");
+            phrase.push_back("BETWEEN");
+            for(char number : token.substr(0,3)) phrase.push_back(std::string(1, number));
+            phrase.push_back("AND");
+            for(char number : token.substr(4,3)) phrase.push_back(std::string(1, number));
+            phrase.push_back("DEGREES");
+        }
+        else if(token.length()==4 && (token=="////" || token.find_first_not_of("0123456789")==std::string::npos)){  // Visibility
+            phrase.push_back("VISIBILITY");
+            if(token == "////"){
+                phrase.push_back("UNKNOWN");
+                continue;
+            }
+            if(token == "9999"){
+                phrase.push_back("1");
+                phrase.push_back("0");
+                phrase.push_back("KILOMETERS");
+                continue;
+            }
+            if(token.substr(1,3) == "000"){
+                phrase.push_back(std::string(1, token[0]));
+                phrase.push_back("KILOMETERS");
+                continue;
+            }
+            if(token.substr(2,2) == "00"){
+                if(token[0] != '0'){
+                    phrase.push_back(std::string(1, token[0]));
+                    phrase.push_back("THOUSAND");
+                }
+                phrase.push_back(std::string(1, token[1]));
+                phrase.push_back("HUNDRED");
+                phrase.push_back("METERS");
+                continue;
+            }
+            
+            for(char number : token) phrase.push_back(std::string(1, number));
+            phrase.push_back("METERS");
+        }
+    }
 
     D_println("Phrase:");
     for(std::string x : phrase) D_println(x.c_str());
