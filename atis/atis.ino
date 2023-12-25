@@ -137,6 +137,59 @@ std::vector<std::string> parseMetar(std::string metar){
 }
 
 /**
+ * Pushes a set of speech tokens to the end of a phrase depending on the METAR token type.
+ * 
+ * @param phrase A phrase vector, passed by reference
+ * @param match The regex match object for the token
+ * @param type The type of token to be converted into speech
+*/
+void convertToken(std::vector<std::string>& phrase, std::smatch match, TokenType type){
+    switch(type){
+        case STATION:
+            break;
+        case TIME:
+            break;
+        case NIL:
+            break;
+        case AUTO:
+            break;
+        case WIND:
+            break;
+        case VARIABLE:
+            break;
+        case VISIBILITY:
+            break;
+        case RVR:
+            break;
+        case WEATHER:
+            break;
+        case CLOUD:
+            break;
+        case NSC:
+            break;
+        case NCD:
+            break;
+        case VERTICAL:
+            break;
+        case TEMPERATURE:
+            break;
+        case QNH:
+            break;
+        case WINDSHEAR:
+            break;
+        case ALL:
+            break;
+        case RWY:
+            break;
+        case RUNWAY_NUMBER:
+            break;
+        default:
+        case ERROR:
+            break;
+    }
+}
+
+/**
  * Transforms the split METAR information output by `parseMetar()` into a list of tokens to be played on the speaker based on the METAR standard.
  * The official METAR standard can be found at <https://ilmailusaa.fi/pdf/Saahaitari_01-2021.pdf>.
  * 
@@ -145,9 +198,19 @@ std::vector<std::string> parseMetar(std::string metar){
  */
 std::vector<std::string> generatePhrase(std::vector<std::string> metar){
     std::vector<std::string> phrase;
+    std::smatch match;
+    TokenType type = ERROR;
 
     for(std::string token : metar){
-        // TODO: Implement regex conversion here
+        for(auto it : regexToToken){
+            std::regex_search(token, match, std::regex(it.first));
+            
+            if(match.size() == 0) continue;
+            type = it.second;
+            break;
+        }
+
+        convertToken(phrase, match, type);
     }
 
     D_println("Phrase:");

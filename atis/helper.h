@@ -90,6 +90,7 @@ enum TokenType {
     ALL,
     RWY,
     RUNWAY_NUMBER,
+    ERROR,
 };
 
 // This map must be updated if the METAR standard changes or bugs are found
