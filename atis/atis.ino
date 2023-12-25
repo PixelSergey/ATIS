@@ -137,54 +137,243 @@ std::vector<std::string> parseMetar(std::string metar){
 }
 
 /**
+ * Pushes a string character-by-character onto the phrase vector
+ * 
+ * @param phrase A phrase vector, passed by reference
+ * @param chars A string to be pushed character-by-character
+ */
+void pushChars(std::vector<std::string>& phrase, std::string chars){
+    for(char character : chars) phrase.push_back(std::string(1, character));
+}
+
+/**
+ * Pushes a number of kilometers, formatted as a proper distance, to the phrase vector
+ */
+void pushKilometers(std::vector<std::string>& phrase, std::string distance){
+    if(distance == "9999"){
+        phrase.push_back("1");
+        phrase.push_back("0");
+        phrase.push_back("KILOMETERS");
+        return;
+    }
+
+    if(distance == "0000"){
+        phrase.push_back("0");
+        phrase.push_back("METERS");
+        return;
+    }
+
+    if(distance.substr(1,3) == "000"){
+        phrase.push_back(distance.substr(0,1));
+        phrase.push_back("KILOMETERS");
+        return;
+    }
+
+    if(distance.substr(2,2) == "00"){
+        if(distance[0] != '0'){
+            phrase.push_back(distance.substr(0,1));
+            phrase.push_back("THOUSAND");
+        }
+        phrase.push_back(distance.substr(1,1));
+        phrase.push_back("HUNDRED");
+        phrase.push_back("METERS");
+        return;
+    }
+
+    pushChars(phrase, distance);
+    phrase.push_back("METERS");
+}
+
+/**
+ * Pushes a number of feet, formatted as a proper distance, to the phrase vector
+ */
+void pushFeet(std::vector<std::string>& phrase, std::string distance){
+    if(distance == "000"){
+        phrase.push_back("0");
+    }
+
+    if(distance[0] != '0'){
+        pushChars(phrase, distance.substr(0,2));
+        phrase.push_back("THOUSAND");
+    }else if(distance[1] != '0'){
+        phrase.push_back(distance.substr(1,1));
+        phrase.push_back("THOUSAND");
+    }
+
+    if(distance[2] != '0'){
+        phrase.push_back(distance.substr(2,1));
+        phrase.push_back("HUNDRED");
+    }
+
+    phrase.push_back("FEET");
+}
+
+/**
  * Pushes a set of speech tokens to the end of a phrase depending on the METAR token type.
  * 
  * @param phrase A phrase vector, passed by reference
  * @param match The regex match object for the token
  * @param type The type of token to be converted into speech
-*/
+ */
 void convertToken(std::vector<std::string>& phrase, std::smatch match, TokenType type){
     switch(type){
         case STATION:
+            if(match[1] == "ILZD") phrase.push_back("KUMPULA");
+            else if(match[1] == "EFHV") phrase.push_back("HYVINKAA");
+            else pushChars(phrase, match[1]);
             break;
         case TIME:
+            pushChars(phrase, match[1]);
+            phrase.push_back("Z");
             break;
         case NIL:
+            phrase.push_back("NO_WEATHER_INFORMATION");
             break;
         case AUTO:
+            phrase.push_back("AUTOMATIC_WEATHER_REPORT");
             break;
         case WIND:
+            phrase.push_back("WIND");
+            if(match[1].length() != 0){
+                phrase.push_back("UNKNOWN");
+                break;
+            }
+            
+            if(match[2] == "VRB"){
+                phrase.push_back("VARIABLE");
+            }else{
+                pushChars(phrase, match[2]);
+                phrase.push_back("DEGREES");
+            }
+
+            pushChars(phrase, match[3]);
+            phrase.push_back("KNOTS");
+
+            if(match[4].length() != 0){
+                phrase.push_back("GUSTING");
+                pushChars(phrase, match[4]);
+                phrase.push_back("KNOTS");
+            }
+
             break;
         case VARIABLE:
+            phrase.push_back("VARIABLE");
+            phrase.push_back("BETWEEN");
+            pushChars(phrase, match[1]);
+            phrase.push_back("AND");
+            pushChars(phrase, match[2]);
+            phrase.push_back("DEGREES");
+            break;
+        case CAVOK:
+            phrase.push_back("CAVOK");
             break;
         case VISIBILITY:
+            phrase.push_back("VISIBILITY");
+            if(match[1].length() != 0){
+                phrase.push_back("UNKNOWN");
+                break;
+            }
+            pushKilometers(phrase, match[2]);
             break;
         case RVR:
+            phrase.push_back("RUNWAY");
+            pushChars(phrase, match[1]);
+            phrase.push_back("VISIBLE_RANGE");
+            
+            if(match[2] == "M"){
+                phrase.push_back("LESS_THAN");
+            }else if(match[2] == "P"){
+                phrase.push_back("MORE_THAN");
+            }
+
+            pushKilometers(phrase, match[3]);
+
+            if(match[4] == "U"){
+                phrase.push_back("AND");
+                phrase.push_back("INCREASING");
+            }else if(match[4] == "D"){
+                phrase.push_back("AND");
+                phrase.push_back("DECREASING");
+            }else if(match[4] == "N"){
+                phrase.push_back("AND");
+                phrase.push_back("REMAINING");
+            }
             break;
         case WEATHER:
+            for(int i=1; i<=3; i++){
+                if(match[i].length() == 0) break;
+                phrase.push_back(weatherToToken[match[i]]);
+            }
             break;
         case CLOUD:
+            phrase.push_back(cloudToToken[match[1]]);
+            pushFeet(phrase, match[2]);
+            if(match[3] == "CB"){
+                phrase.push_back("CUMULONIMBUS");
+            }else if(match[3] == "TCU"){
+                phrase.push_back("TOWERING_CUMULUS");
+            }
             break;
         case NSC:
+            phrase.push_back("NO_SIGNIFICANT_CLOUD");
             break;
         case NCD:
+            phrase.push_back("NO_CLOUD_DETECTED");
             break;
         case VERTICAL:
+            phrase.push_back("VERTICAL");
+            phrase.push_back("VISIBILITY");
+            pushFeet(phrase, match[1]);
             break;
         case TEMPERATURE:
+            phrase.push_back("TEMPERATURE");
+            if(match[1].length() != 0){
+                phrase.push_back("UNKNOWN");
+            }
+            if(match[2].length() != 0){
+                phrase.push_back("MINUS");
+            }
+            if(match[3].length() != 0){
+                pushChars(phrase, match[3]);
+                phrase.push_back("DEGREES");
+            }
+
+            phrase.push_back("DEWPOINT");
+            if(match[4].length() != 0){
+                phrase.push_back("UNKNOWN");
+            }
+            if(match[5].length() != 0){
+                phrase.push_back("MINUS");
+            }
+            if(match[6].length() != 0){
+                pushChars(phrase, match[6]);
+                phrase.push_back("DEGREES");
+            }
             break;
         case QNH:
+            phrase.push_back("QNH");
+            if(match[1].length() != 0){
+                phrase.push_back("UNKNOWN");
+                break;
+            }
+            pushChars(phrase, match[2]);
             break;
         case WINDSHEAR:
+            phrase.push_back("WINDSHEAR");
             break;
         case ALL:
+            phrase.push_back("ALL");
             break;
         case RWY:
+            phrase.push_back("RUNWAY");
             break;
         case RUNWAY_NUMBER:
+            phrase.push_back("RUNWAY");
+            pushChars(phrase, match[1]);
             break;
         default:
         case ERROR:
+            phrase.push_back("ERROR");
             break;
     }
 }
