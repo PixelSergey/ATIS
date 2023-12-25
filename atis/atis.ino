@@ -148,7 +148,43 @@ std::vector<std::string> generatePhrase(std::vector<std::string> metar){
     std::vector<std::string> phrase;
 
     for(std::string token : metar){
-        if(token.substr(0,2) == "IL" || token.substr(0,2) == "EF"){  // Station code
+        // Simple tokens first
+        if(token == "NIL"){  // No weather information
+            phrase.push_back("NO_WEATHER_INFORMATION");
+        }
+        else if(token == "AUTO"){  // Automatic weather report
+            phrase.push_back("AUTOMATIC_WEATHER_REPORT");
+        }
+        else if(token == "WS"){  // Windshear
+            phrase.push_back("WINDSHEAR");
+        }
+        else if(token == "ALL"){  // Windshear on all runways
+            phrase.push_back("ALL");
+        }
+        else if(token == "RWY"){  // Windshear on all runways
+            phrase.push_back("RUNWAY");
+        }
+        else if(token == "NSC"){  // No significant cloud
+            phrase.push_back("NO_SIGNIFICANT_CLOUD");
+        }
+        else if(token == "NCD"){  // No cloud detected (automatic weather stations only)
+            phrase.push_back("NO_CLOUD_DETECTED");
+        }
+
+        // Slightly more complex tokens
+        else if(token.length() == 3 && token.front()=='R'){  // Windshear on specific runway
+            phrase.push_back("RUNWAY");
+            for(char number : token.substr(1,2)) phrase.push_back(std::string(1, number));
+        }
+        else if(token.length() == 5 && token.front()=='Q'){  // QNH value
+            phrase.push_back("QNH");
+            if(token == "Q////"){
+                phrase.push_back("UNKNOWN");
+                continue;
+            }
+            for(char number : token.substr(1,4)) phrase.push_back(std::string(1, number));
+        }
+        else if(token.substr(0,2) == "IL" || token.substr(0,2) == "EF"){  // Station code
             phrase.push_back("THIS_IS");
             if(token == "ILZD"){
                 phrase.push_back("KUMPULA");
@@ -156,16 +192,10 @@ std::vector<std::string> generatePhrase(std::vector<std::string> metar){
             phrase.push_back("INFORMATION");
             phrase.push_back(std::vector({"A","B","C"})[rand()%3]);
         }
-        else if(token.length()==5 && token.back()=='Z' && token.substr(0,4).find_first_not_of("0123456789")==std::string::npos){ // Time
+        else if(token.length()==7 && token.back()=='Z' && token.substr(0,6).find_first_not_of("0123456789")==std::string::npos){ // Time
             phrase.push_back("AT");
             phrase.push_back("TIME");
-            for(char number : token.substr(0,4)) phrase.push_back(std::string(1, number));
-        }
-        else if(token == "NIL"){  // No weather information
-            phrase.push_back("NO_WEATHER_INFORMATION");
-        }
-        else if(token == "AUTO"){  // Automatic weather report
-            phrase.push_back("AUTOMATIC_WEATHER_REPORT");
+            for(char number : token.substr(2,4)) phrase.push_back(std::string(1, number));
         }
         else if(token.find("KT") != std::string::npos){  // Wind
             phrase.push_back("WIND");
@@ -231,6 +261,221 @@ std::vector<std::string> generatePhrase(std::vector<std::string> metar){
             
             for(char number : token) phrase.push_back(std::string(1, number));
             phrase.push_back("METERS");
+        }
+        else if(token.length()>=8 && token[0]=='R' && token[3]=='/'){  // Runway visible range
+            phrase.push_back("RUNWAY");
+            for(char number : token.substr(1,2)) phrase.push_back(std::string(1, number));
+            phrase.push_back("VISIBLE");
+            phrase.push_back("RANGE");
+            int offset = 0;
+            if(token[5]=='M'){
+                phrase.push_back("LESS");
+                phrase.push_back("THAN");
+                offset = 1;
+            }
+            if(token[5]=='P'){
+                phrase.push_back("MORE");
+                phrase.push_back("THAN");
+                offset = 1;
+            }
+            for(char number : token.substr(4+offset,4)) phrase.push_back(std::string(1, number));
+            phrase.push_back("METERS");
+            if(token.back()=='U'){
+                phrase.push_back("AND");
+                phrase.push_back("INCREASING");
+            }
+            else if(token.back()=='D'){
+                phrase.push_back("AND");
+                phrase.push_back("DECREASING");
+            }
+            else if(token.back()=='N'){
+                phrase.push_back("AND");
+                phrase.push_back("REMAINING_CONSTANT");
+            }
+        }
+
+        else if(token.substr(0,3) == "FEW"){
+            phrase.push_back("FEW");
+            if(token.substr(3,3) == "000"){
+                phrase.push_back("0");
+                phrase.push_back("FEET");
+                continue;
+            }
+
+            if(token[3] != '0'){
+                phrase.push_back(std::string(1, token[3]));
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }else if(token[4] != '0'){
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }
+
+            if(token[5] != '0'){
+                phrase.push_back(std::string(1, token[5]));
+                phrase.push_back("HUNDRED");
+            }
+
+            phrase.push_back("FEET");
+
+            if(token.substr(token.length()-3, 3)=="TCU"){
+                phrase.push_back("TOWERING_CUMULUS");
+            }
+            if(token.substr(token.length()-2, 2)=="CB"){
+                phrase.push_back("CUMULONIMBUS");
+            }
+        }
+        else if(token.substr(0,3) == "SCT"){
+            phrase.push_back("SCATTERED");
+            if(token.substr(3,3) == "000"){
+                phrase.push_back("0");
+                phrase.push_back("FEET");
+                continue;
+            }
+
+            if(token[3] != '0'){
+                phrase.push_back(std::string(1, token[3]));
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }else if(token[4] != '0'){
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }
+
+            if(token[5] != '0'){
+                phrase.push_back(std::string(1, token[5]));
+                phrase.push_back("HUNDRED");
+            }
+
+            phrase.push_back("FEET");
+
+            if(token.substr(token.length()-3, 3)=="TCU"){
+                phrase.push_back("TOWERING_CUMULUS");
+            }
+            if(token.substr(token.length()-2, 2)=="CB"){
+                phrase.push_back("CUMULONIMBUS");
+            }
+        }
+        else if(token.substr(0,3) == "BKN"){
+            phrase.push_back("BROKEN");
+            if(token.substr(3,3) == "000"){
+                phrase.push_back("0");
+                phrase.push_back("FEET");
+                continue;
+            }
+
+            if(token[3] != '0'){
+                phrase.push_back(std::string(1, token[3]));
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }else if(token[4] != '0'){
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }
+
+            if(token[5] != '0'){
+                phrase.push_back(std::string(1, token[5]));
+                phrase.push_back("HUNDRED");
+            }
+
+            phrase.push_back("FEET");
+
+            if(token.substr(token.length()-3, 3)=="TCU"){
+                phrase.push_back("TOWERING_CUMULUS");
+            }
+            if(token.substr(token.length()-2, 2)=="CB"){
+                phrase.push_back("CUMULONIMBUS");
+            }
+        }
+        else if(token.substr(0,3) == "OVC"){
+            phrase.push_back("OVERCAST");
+            if(token.substr(3,3) == "000"){
+                phrase.push_back("0");
+                phrase.push_back("FEET");
+                continue;
+            }
+
+            if(token[3] != '0'){
+                phrase.push_back(std::string(1, token[3]));
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }else if(token[4] != '0'){
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }
+
+            if(token[5] != '0'){
+                phrase.push_back(std::string(1, token[5]));
+                phrase.push_back("HUNDRED");
+            }
+
+            phrase.push_back("FEET");
+
+            if(token.substr(token.length()-3, 3)=="TCU"){
+                phrase.push_back("TOWERING_CUMULUS");
+            }
+            if(token.substr(token.length()-2, 2)=="CB"){
+                phrase.push_back("CUMULONIMBUS");
+            }
+        }
+        if(token.substr(0,2) == "VV"){
+            phrase.push_back("VERTICAL");
+            phrase.push_back("VISIBILITY");
+            if(token.substr(3,3) == "000"){
+                phrase.push_back("0");
+                phrase.push_back("FEET");
+                continue;
+            }
+
+            if(token[3] != '0'){
+                phrase.push_back(std::string(1, token[3]));
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }else if(token[4] != '0'){
+                phrase.push_back(std::string(1, token[4]));
+                phrase.push_back("THOUSAND");
+            }
+
+            if(token[5] != '0'){
+                phrase.push_back(std::string(1, token[5]));
+                phrase.push_back("HUNDRED");
+            }
+
+            phrase.push_back("FEET");
+        }
+        else if(token.length()>=5 && token.find("/") != std::string::npos){  // Temperature and dewpoint
+            phrase.push_back("TEMPERATURE");
+            int offset = 0;
+            if(token[0]=='M'){
+                phrase.push_back("MINUS");
+                offset += 1;
+            }
+            
+            if(token.substr(0+offset,2)=="//"){
+                phrase.push_back("UNKNOWN");
+            }else{
+                if(token[0+offset] == '0'){
+                    phrase.push_back(std::string(1, token[0+offset+1]));
+                }else{
+                    for(char number : token.substr(0+offset,2)) phrase.push_back(std::string(1, number));
+                }
+            }
+
+            phrase.push_back("DEWPOINT");
+            if(token[3+offset]=='M'){
+                phrase.push_back("MINUS");
+                offset += 1;
+            }
+            
+            if(token.substr(3+offset,2)=="//"){
+                phrase.push_back("UNKNOWN");
+            }else{
+                if(token[3+offset] == '0'){
+                    phrase.push_back(std::string(1, token[3+offset+1]));
+                }else{
+                    for(char number : token.substr(3+offset,2)) phrase.push_back(std::string(1, number));
+                }
+            }
         }
     }
 
