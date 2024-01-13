@@ -39,4 +39,5 @@ The RX port is used by the `AudioOutputI2SNoDAC` library to output sound.
 
 - Finnish meteorological institute
 - Aeroplane manufacturers
+- [Brilliant article on why `delay()` is evil](https://8266iot.blogspot.com/p/dont-delay.html)
 - [How to exit vim](https://stackoverflow.com/questions/11828270/how-do-i-exit-the-vim-editor)

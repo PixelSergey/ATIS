@@ -56,17 +56,20 @@
 
 // Audio include
 
-#include "audio.h"
+// #include "audio.h"
 
 // This map must be updated if audio files are added or removed
-std::map<std::string, std::pair<const unsigned char*, unsigned int>> tokenToAudio = {
+const std::map<std::string, std::pair<const unsigned char*, unsigned int>> tokenToAudio PROGMEM = {
+    /*
     {"A", {A_mp3, A_mp3_len}},
     {"B", {B_mp3, B_mp3_len}},
     {"C", {C_mp3, C_mp3_len}},
     {"THIS_IS", {THIS_IS_mp3, THIS_IS_mp3_len}},
     {"KUMPULA", {KUMPULA_mp3, KUMPULA_mp3_len}},
     {"INFORMATION", {INFORMATION_mp3, INFORMATION_mp3_len}},
+    */
 };
+
 
 // This enum contains all the possible METAR tokens
 // Must be updated if the METAR standard changes or bugs are found
@@ -95,7 +98,7 @@ enum TokenType {
 };
 
 // This map must be updated if the METAR standard changes or bugs are found
-std::map<std::string, TokenType> regexToToken = {
+const std::map<std::string, TokenType> regexToToken PROGMEM = {
     {"^(IL..$|^EF..)$", STATION},
     {"^[0-9]{2}([0-9]{4})Z$", TIME},
     {"^NIL$", NIL},
@@ -118,7 +121,7 @@ std::map<std::string, TokenType> regexToToken = {
     {"^R([0-9]{2})$", RUNWAY_NUMBER},
 };
 
-std::map<std::string, std::string> weatherToToken = {
+const std::map<std::string, std::string> weatherToToken PROGMEM = {
     {"+","HEAVY"},
     {"-","LIGHT"},
     {"VC","VICINITY"},
@@ -153,7 +156,7 @@ std::map<std::string, std::string> weatherToToken = {
     {"DS","DUST_STORM"},
 };
 
-std::map<std::string, std::string> cloudToToken = {
+const std::map<std::string, std::string> cloudToToken PROGMEM = {
     {"FEW","FEW"},
     {"SCT","SCATTERED"},
     {"BKN","BROKEN"},

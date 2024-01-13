@@ -302,11 +302,11 @@ void convertToken(std::vector<std::string>& phrase, std::smatch match, TokenType
         case WEATHER:
             for(int i=1; i<=3; i++){
                 if(match[i].length() == 0) break;
-                phrase.push_back(weatherToToken[match[i]]);
+                phrase.push_back(weatherToToken.at(match[i]));
             }
             break;
         case CLOUD:
-            phrase.push_back(cloudToToken[match[1]]);
+            phrase.push_back(cloudToToken.at(match[1]));
             pushFeet(phrase, match[2]);
             if(match[3] == "CB"){
                 phrase.push_back("CUMULONIMBUS");
@@ -449,6 +449,4 @@ void setup(){
 void loop(){
     std::vector<std::string> phrase = getNewMetarPhrase();
     for(int i=0; i<phrase.size(); i++) playToken(phrase[i]);
-    
-    delay(2000);
 }
