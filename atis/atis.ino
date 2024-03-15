@@ -251,4 +251,5 @@ void loop(){
     std::vector<TokenType> phrase;
     getNewMetarPhrase(phrase);
     for(int i=0; i<phrase.size(); i++) playToken(phrase[i]);
+    delay(2000);
 }
