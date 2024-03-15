@@ -29,8 +29,8 @@
 void playMp3(const unsigned char* data, unsigned int length){
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
     AudioGeneratorMP3* aud = new AudioGeneratorMP3();
-
     AudioFileSourcePROGMEM* clip = new AudioFileSourcePROGMEM(data, length);
+
     aud->begin(clip, out);
     while(aud->loop());
     aud->stop();
@@ -46,14 +46,11 @@ void playMp3(const unsigned char* data, unsigned int length){
  * 
  * @param token The name of the token to play
  */
-void playToken(std::string token){
-    auto it = tokenToAudio.find(token);
-    if(it == tokenToAudio.end()){
-        return;
-    }
+void playToken(TokenType token){
+    if(token >= std::size(tokenToAudio)) return;
 
-    const unsigned char* data = it->second.first;
-    unsigned int length = it->second.second;
+    const unsigned char* data = tokenToAudio[token].first;
+    unsigned int length = tokenToAudio[token].second;
     playMp3(data, length);
 }
 
@@ -115,9 +112,7 @@ std::string decodeMetar(std::string metar){
  * @param metar A METAR string in standard format
  * @return A vector containing the METAR information split on spaces
  */
-std::vector<std::string> parseMetar(std::string metar){
-    std::vector<std::string> parsed;
-
+void parseMetar(std::vector<std::string>& parsed, std::string metar){
     // Remove terminating equals sign
     metar.pop_back();
     
@@ -132,8 +127,6 @@ std::vector<std::string> parseMetar(std::string metar){
 
     D_println("Parsed:");
     for(std::string x : parsed) D_println(x.c_str());
-
-    return parsed;
 }
 
 /**
@@ -143,48 +136,48 @@ std::vector<std::string> parseMetar(std::string metar){
  * @param match The regex match object for the token
  * @param type The type of token to be converted into speech
 */
-void convertToken(std::vector<std::string>& phrase, std::smatch match, TokenType type){
+void convertToken(std::vector<TokenType>& phrase, std::smatch match, InformationType type){
     switch(type){
-        case STATION:
+        case I_STATION:
             break;
-        case TIME:
+        case I_TIME:
             break;
-        case NIL:
+        case I_NIL:
             break;
-        case AUTO:
+        case I_AUTO:
             break;
-        case WIND:
+        case I_WIND:
             break;
-        case VARIABLE:
+        case I_VARIABLE:
             break;
-        case VISIBILITY:
+        case I_VISIBILITY:
             break;
-        case RVR:
+        case I_RVR:
             break;
-        case WEATHER:
+        case I_WEATHER:
             break;
-        case CLOUD:
+        case I_CLOUD:
             break;
-        case NSC:
+        case I_NSC:
             break;
-        case NCD:
+        case I_NCD:
             break;
-        case VERTICAL:
+        case I_VERTICAL:
             break;
-        case TEMPERATURE:
+        case I_TEMPERATURE:
             break;
-        case QNH:
+        case I_QNH:
             break;
-        case WINDSHEAR:
+        case I_WINDSHEAR:
             break;
-        case ALL:
+        case I_ALL:
             break;
-        case RWY:
+        case I_RWY:
             break;
-        case RUNWAY_NUMBER:
+        case I_RUNWAY_NUMBER:
             break;
         default:
-        case ERROR:
+        case I_ERROR:
             break;
     }
 }
@@ -196,13 +189,12 @@ void convertToken(std::vector<std::string>& phrase, std::smatch match, TokenType
  * @param metar A vector of METAR information
  * @return A vector containing individual speech tokens
  */
-std::vector<std::string> generatePhrase(std::vector<std::string> metar){
-    std::vector<std::string> phrase;
+void generatePhrase(std::vector<TokenType>& phrase, std::vector<std::string> metar){
     std::smatch match;
-    TokenType type = ERROR;
+    InformationType type = I_ERROR;
 
     for(std::string token : metar){
-        for(auto it : regexToToken){
+        for(std::pair<const char*, InformationType> it : regexToToken){
             std::regex_search(token, match, std::regex(it.first));
             
             if(match.size() == 0) continue;
@@ -214,9 +206,7 @@ std::vector<std::string> generatePhrase(std::vector<std::string> metar){
     }
 
     D_println("Phrase:");
-    for(std::string x : phrase) D_println(x.c_str());
-
-    return phrase;
+    for(TokenType x : phrase) D_println(x);
 }
 
 /**
@@ -224,12 +214,12 @@ std::vector<std::string> generatePhrase(std::vector<std::string> metar){
  * 
  * @return A vector containing the speech tokens corresponding to current METAR information
  */
-std::vector<std::string> getNewMetarPhrase(){
+void getNewMetarPhrase(std::vector<TokenType>& phrase){
     std::string metar = getMetar();
     std::string decoded = decodeMetar(metar);
-    std::vector<std::string> parsed = parseMetar(decoded);
-    std::vector<std::string> phrase = generatePhrase(parsed);
-    return phrase;
+    std::vector<std::string> parsed;
+    parseMetar(parsed, decoded);
+    generatePhrase(phrase, parsed);
 }
 
 /**
@@ -258,8 +248,7 @@ void setup(){
  * Main program loop
  */
 void loop(){
-    std::vector<std::string> phrase = getNewMetarPhrase();
+    std::vector<TokenType> phrase;
+    getNewMetarPhrase(phrase);
     for(int i=0; i<phrase.size(); i++) playToken(phrase[i]);
-    
-    delay(2000);
 }

@@ -54,7 +54,7 @@ echo "/**
 
 for f in *.mp3;
 do
-    xxd -i $f | sed "s/unsigned char \(.*\) = {/const unsigned char \1 PROGMEM = {/" - >> ../../atis/audio.h
+    xxd -i $f | sed "s/unsigned char \(.*\) = {/const unsigned char \1 PROGMEM = {/" - | sed "s/unsigned int/const unsigned int/" - >> ../../atis/audio.h
 done
 
 echo "Done!"
