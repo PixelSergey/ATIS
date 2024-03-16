@@ -47,7 +47,6 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <WiFiClientSecureBearSSL.h>
-#include <ArduinoJson.h>
 
 #include "AudioFileSourcePROGMEM.h"
 #include "AudioGeneratorMP3.h"
@@ -60,8 +59,8 @@
 // Enums
 
 enum TokenType {
-    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINER,
     ALPHA, BRAVO, CHARLIE, DELTA, ECHO, FOXTROT, GOLF, HOTEL, INDIA, JULIET, KILO, LIMA, MIKE, NOVEMBER, OSCAR, PAPA, QUEBEC, ROMEO, SIERRA, TANGO, UNIFORM, VICTOR, WHISKEY, XRAY, YANKEE, ZULU,
+    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINER,
     THOUSAND,
     HUNDRED,
     FEET,
@@ -176,25 +175,25 @@ constexpr std::pair<const unsigned char*, unsigned int> tokenToAudio[] = {
 
 // This map must be updated if the METAR standard changes or bugs are found
 constexpr std::pair<const char*, InformationType> regexToToken[] = {
-    {"^(IL..$|^EF..)$", I_STATION},
-    {"^[0-9]{2}([0-9]{4})Z$", I_TIME},
-    {"^NIL$", I_NIL},
-    {"^AUTO$", I_AUTO},
-    {"^(?:(\\/{5})|(VRB|[0-9]{3})([0-9]{2})(?:G([0-9]{2}))?)KT$", I_WIND},
-    {"^([0-9]{3})V([0-9]{3})$", I_VARIABLE},
-    {"^(\\/{4})|([0-9]{4})$", I_VISIBILITY},
-    {"^R([0-9]{2})\\/([MP]?)([0-9]{4})([UDN]?)$", I_RVR},
-    {"^(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?$", I_WEATHER},
-    {"^(FEW|SCT|BKN|OVC)([0-9]{3})(CB|TCU)?$", I_CLOUD},
-    {"^NSC$", I_NSC},
-    {"^NCD$", I_NCD},
-    {"^VV([0-9]{3})$", I_VERTICAL},
-    {"^(?:(M)?([0-9]{2})|\\/{2})\\/(?:(M)?([0-9]{2})|\\/{2})$", I_TEMPERATURE},
-    {"^Q(?:([0-9]{4})|\\/{4})$", I_QNH},
-    {"^WS$", I_WINDSHEAR},
-    {"^ALL$", I_ALL},
-    {"^RWY$", I_RWY},
-    {"^R([0-9]{2})$", I_RUNWAY_NUMBER},
+    {"(IL..|EF..)", I_STATION},
+    {"[0-9]{2}([0-9]{4})Z", I_TIME},
+    {"NIL", I_NIL},
+    {"AUTO", I_AUTO},
+    {"(?:(\\/{5})|(VRB|[0-9]{3})([0-9]{2})(?:G([0-9]{2}))?)KT", I_WIND},
+    {"([0-9]{3})V([0-9]{3})", I_VARIABLE},
+    {"(\\/{4})|([0-9]{4})", I_VISIBILITY},
+    {"R([0-9]{2})\\/([MP]?)([0-9]{4})([UDN]?)", I_RVR},
+    {"(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?", I_WEATHER},
+    {"(FEW|SCT|BKN|OVC)([0-9]{3})(CB|TCU)?", I_CLOUD},
+    {"NSC", I_NSC},
+    {"NCD", I_NCD},
+    {"VV([0-9]{3})", I_VERTICAL},
+    {"(?:(M)?([0-9]{2})|\\/{2})\\\\\\/(?:(M)?([0-9]{2})|\\/{2})", I_TEMPERATURE},
+    {"Q(?:([0-9]{4})|\\/{4})", I_QNH},
+    {"WS", I_WINDSHEAR},
+    {"ALL", I_ALL},
+    {"RWY", I_RWY},
+    {"R([0-9]{2})", I_RUNWAY_NUMBER},
 };
 
 #endif

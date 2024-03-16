@@ -27,13 +27,17 @@
  * @param length The length of the data array
  */
 void playMp3(const unsigned char* data, unsigned int length){
+    D_println("Setup");
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
     AudioGeneratorMP3* aud = new AudioGeneratorMP3();
     AudioFileSourcePROGMEM* clip = new AudioFileSourcePROGMEM(data, length);
 
+    D_println("Loop");
     aud->begin(clip, out);
     while(aud->loop());
     aud->stop();
+
+    D_println("Delet");
 
     delete clip;
     delete aud;
@@ -60,7 +64,7 @@ void playToken(TokenType token){
  * 
  * @return The raw JSON-formatted HTTP reponse body returned by ilmailusaa.fi 
  */
-std::string getMetar(){
+void getMetar(char* response, int size_response){
     BearSSL::WiFiClientSecure* client = new BearSSL::WiFiClientSecure();
     client->setInsecure();
     HTTPClient https;
@@ -70,17 +74,18 @@ std::string getMetar(){
 
     if(responseCode <= 0){
         D_println("Error in HTTPS request");
-        return "ERROR";
+        strncpy(response, "ERROR", size_response);
+        response[size_response-1] = '\0';
+        return;
     }
 
-    std::string response = std::string(https.getString().c_str());
+    strncpy(response, https.getString().c_str(), size_response);
+    response[size_response-1] = '\0';
     https.end();
     delete client;
 
     D_println("Response:");
-    D_println(response.c_str());
-
-    return response;
+    D_println(response);
 }
 
 /**
@@ -89,21 +94,28 @@ std::string getMetar(){
  * @param metar A string containing a JSON-formatted response from ilmailusaa.fi
  * @return A string containing the current METAR information
  */
-std::string decodeMetar(std::string metar){
-    return "ILZD 232320Z AUTO 32020G31KT 280V340 3900=";
-    StaticJsonDocument<384> jsonDocument;
-    DeserializationError error = deserializeJson(jsonDocument, metar);
-    if(error){
-        D_print("Error deserialising JSON: ");
-        D_println(error.f_str());
-        return "ERROR";
+int decodeMetar(char* metar, int size_metar, char* raw, int size_raw){
+    char* begin = strstr(raw, "\"p1\":\"");
+    if(begin == NULL){
+        strncpy(metar, "ERROR", size_metar);
+        metar[size_metar-1] = '\0';
+        return min(5, size_metar);
+    }
+    begin += 6;
+
+    char* end = strstr(begin, "\"");
+    if(end == NULL || size_metar < end-begin){
+        strncpy(metar, "ERROR", size_metar);
+        metar[size_metar-1] = '\0';
+        return min(5, size_metar);
     }
 
-    std::string decoded = jsonDocument.as<JsonObject>().begin()->value()["p1"].as<std::string>();
+    int copied = end-begin-1;
+    strncpy(metar, begin, copied);
+    metar[copied] = '\0';
     D_println("Decoded:");
-    D_println(decoded.c_str());
-
-    return decoded;
+    D_println(metar);
+    return copied+1;
 }
 
 /**
@@ -112,21 +124,25 @@ std::string decodeMetar(std::string metar){
  * @param metar A METAR string in standard format
  * @return A vector containing the METAR information split on spaces
  */
-void parseMetar(std::vector<std::string>& parsed, std::string metar){
-    // Remove terminating equals sign
-    metar.pop_back();
-    
+int parseMetar(char** parsed, int size_parsed, char* metar, int size_metar){
     // Split string on spaces
-    size_t i = 0;
-    while(i != std::string::npos){
-        i = metar.find(" ");
-        std::string token = metar.substr(0, i);
-        parsed.push_back(token);
-        metar.erase(0, i+1);
+    parsed[0] = metar;
+    int j = 1;
+    for(int i=0; i<size_metar; i++){
+        if(metar[i] == ' '){
+            metar[i] = '\0';
+            parsed[j] = metar + i + 1;
+            j++;
+        }
     }
 
-    D_println("Parsed:");
-    for(std::string x : parsed) D_println(x.c_str());
+    D_println("Parsed");
+    for(int i=0; i<j; i++){
+        D_print(parsed[i]);
+        D_print("|");
+    }
+    D_println();
+    return j;
 }
 
 /**
@@ -136,10 +152,10 @@ void parseMetar(std::vector<std::string>& parsed, std::string metar){
  * @param match The regex match object for the token
  * @param type The type of token to be converted into speech
 */
-void convertToken(std::vector<TokenType>& phrase, std::smatch match, InformationType type){
+int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match, InformationType type){
     switch(type){
         case I_STATION:
-            break;
+            if(pos==size_phrase) return size_phrase; phrase[pos]=ALPHA; pos++;
         case I_TIME:
             break;
         case I_NIL:
@@ -180,6 +196,7 @@ void convertToken(std::vector<TokenType>& phrase, std::smatch match, Information
         case I_ERROR:
             break;
     }
+    return pos;
 }
 
 /**
@@ -189,24 +206,25 @@ void convertToken(std::vector<TokenType>& phrase, std::smatch match, Information
  * @param metar A vector of METAR information
  * @return A vector containing individual speech tokens
  */
-void generatePhrase(std::vector<TokenType>& phrase, std::vector<std::string> metar){
-    std::smatch match;
-    InformationType type = I_ERROR;
-
-    for(std::string token : metar){
+int generatePhrase(TokenType* phrase, int size_phrase, char** metar, int size_metar){
+    int pos = 0;
+    for(int i=0; i<size_metar; i++){
+        InformationType type = I_ERROR;
+        std::cmatch match;
         for(std::pair<const char*, InformationType> it : regexToToken){
-            std::regex_search(token, match, std::regex(it.first));
-            
-            if(match.size() == 0) continue;
+            bool found = std::regex_match(metar[i], match, std::regex(it.first));
+            if(!found) continue;
+
             type = it.second;
             break;
         }
 
-        convertToken(phrase, match, type);
+        pos = convertToken(phrase, size_phrase, pos, match, type);
     }
 
     D_println("Phrase:");
-    for(TokenType x : phrase) D_println(x);
+    for(int i=0; i<pos; i++) D_println(phrase[i]);
+    return pos;
 }
 
 /**
@@ -214,12 +232,15 @@ void generatePhrase(std::vector<TokenType>& phrase, std::vector<std::string> met
  * 
  * @return A vector containing the speech tokens corresponding to current METAR information
  */
-void getNewMetarPhrase(std::vector<TokenType>& phrase){
-    std::string metar = getMetar();
-    std::string decoded = decodeMetar(metar);
-    std::vector<std::string> parsed;
-    parseMetar(parsed, decoded);
-    generatePhrase(phrase, parsed);
+int getNewMetarPhrase(TokenType* phrase, int size_phrase){
+    char response[350];
+    char metar[150];
+    char* parsed[25];
+    getMetar(response, 350);
+    int size_metar = decodeMetar(metar, 150, response, 350);
+    int size_parsed = parseMetar(parsed, 25, metar, size_metar);
+    int size_generated = generatePhrase(phrase, size_phrase, parsed, size_parsed);
+    return size_generated;
 }
 
 /**
@@ -248,8 +269,10 @@ void setup(){
  * Main program loop
  */
 void loop(){
-    std::vector<TokenType> phrase;
-    getNewMetarPhrase(phrase);
-    for(int i=0; i<phrase.size(); i++) playToken(phrase[i]);
-    delay(2000);
+    TokenType phrase[200];
+    int size_generated = getNewMetarPhrase(phrase, 200);
+    D_println("Done!!");
+    //for(int i=0; i<size_generated; i++) playToken(phrase[i]);
+    playMp3(A_mp3, A_mp3_len);
+    //delay(2000);
 }
