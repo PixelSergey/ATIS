@@ -43,9 +43,8 @@
 // Arduino library includes
 
 #include <Arduino.h>
-#include <WiFiManager.h>
+#include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
 #include <WiFiClientSecureBearSSL.h>
 
 #include "AudioFileSourcePROGMEM.h"

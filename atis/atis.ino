@@ -42,6 +42,8 @@ void playMp3(const unsigned char* data, unsigned int length){
     delete clip;
     delete aud;
     delete out;
+
+    D_println("Exiting");
 }
 
 /**
@@ -153,9 +155,10 @@ int parseMetar(char** parsed, int size_parsed, char* metar, int size_metar){
  * @param type The type of token to be converted into speech
 */
 int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match, InformationType type){
+    D_println("Converting");
     switch(type){
         case I_STATION:
-            if(pos==size_phrase) return size_phrase; phrase[pos]=ALPHA; pos++;
+            if(pos>=size_phrase) return size_phrase; phrase[pos]=ALPHA; pos++;
         case I_TIME:
             break;
         case I_NIL:
@@ -215,6 +218,7 @@ int generatePhrase(TokenType* phrase, int size_phrase, char** metar, int size_me
             bool found = std::regex_match(metar[i], match, std::regex(it.first));
             if(!found) continue;
 
+            D_print("Found match for "); D_print(metar[i]); D_print(" with type "); D_println(it.second);
             type = it.second;
             break;
         }
@@ -252,14 +256,10 @@ void setup(){
     digitalWrite(LED, HIGH);  // Turn on setup light
     D_SerialBegin(115200);
 
-    // WiFi setup
-    // The WiFiManager class is rather heavy.
-    // These curly brackets create a scope for wifiManager,
-    // so that the object is destroyed after a connection is established.
-    {
-        WiFiManager wifiManager;
-        wifiManager.autoConnect("ATIS");
-    }
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    while(WiFi.status() != WL_CONNECTED) delay(100);
 
     // Turn off setup light
     digitalWrite(LED, LOW);
