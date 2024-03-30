@@ -273,7 +273,6 @@ void setup(){
 void loop(){
     int size_generated = getNewMetarPhrase(phrase, 200);
     D_println("Done!!");
-    //for(int i=0; i<size_generated; i++) playToken(phrase[i]);
-    playMp3(A_mp3, A_mp3_len);
-    //delay(2000);
+    for(int i=0; i<size_generated; i++) playToken(phrase[i]);
+    delay(2000);
 }
