@@ -368,6 +368,9 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_VERTICAL:
+            PushToken(VERTICAL);
+            PushToken(VISIBILITY);
+            PushHeight(Match(1));
             break;
 
         case I_TEMPERATURE:
