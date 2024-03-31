@@ -191,6 +191,7 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"AUTO", I_AUTO},
     {"(?:((?:\\\\\\/){5})|(00000)|(?:(VRB)|([0-9]{3}))([0-9]{2})(?:G([0-9]{2}))?)KT", I_WIND},
     {"([0-9]{3})V([0-9]{3})", I_VARIABLE},
+    {"CAVOK", I_CAVOK},
     {"(\\\\\\/{4})|([0-9]{4})", I_VISIBILITY},
     {"R([0-9]{2})\\\\\\/([MP]?)([0-9]{4})([UDN]?)", I_RVR},
     {"(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?", I_WEATHER},

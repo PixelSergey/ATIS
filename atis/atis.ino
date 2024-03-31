@@ -150,12 +150,13 @@ int parseMetar(char** parsed, int size_parsed, char* metar, int size_metar){
     return j;
 }
 
-
 void pushToken(TokenType* phrase, int size_phrase, int& pos, TokenType token){
     if(pos >= size_phrase){
         pos = size_phrase;
         return;
     }
+
+    D_print("Pushing "); D_println(token);
     phrase[pos] = token;
     pos++;
 }
@@ -167,7 +168,6 @@ void pushNumbers(TokenType* phrase, int size_phrase, int& pos, const char* numbe
 void pushChars(TokenType* phrase, int size_phrase, int& pos, const char* chars, int count){
     for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(chars[i]-55));  // Ascii A = Dec 65
 }
-
 
 /**
  * Pushes a set of speech tokens to the end of a phrase depending on the METAR token type.
@@ -194,9 +194,11 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
 
         case I_NIL:
             PushToken(NO_WEATHER_INFORMATION);
+            break;
 
         case I_AUTO:
             PushToken(AUTOMATIC_WEATHER_REPORT);
+            break;
 
         case I_WIND:
             PushToken(WIND);
@@ -227,9 +229,9 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
         case I_VARIABLE:
             PushToken(VARIABLE);
             PushToken(BETWEEN);
-            PushNumbers(Match(1));
+            PushNumbers(Match(1), 3);
             PushToken(AND);
-            PushNumbers(Match(2));
+            PushNumbers(Match(2), 3);
             PushToken(DEGREES);
             break;
 
@@ -291,6 +293,7 @@ int generatePhrase(TokenType* phrase, int size_phrase, char** metar, int size_me
     for(int i=0; i<size_metar; i++){
         InformationType type = I_ERROR;
         std::cmatch match;
+        D_print("Searching match for "); D_println(metar[i]);
         for(std::pair<const char*, InformationType> it : regexToToken){
             bool found = std::regex_match(metar[i], match, std::regex(it.first));
             if(!found) continue;
