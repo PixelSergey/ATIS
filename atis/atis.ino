@@ -217,10 +217,10 @@ void pushHeight(TokenType* phrase, int size_phrase, int& pos, const char* height
     }
 
     if(strncmp(height, "0", 1) != 0){
-        PushNumbers(phrase, 2);
+        PushNumbers(height, 2);
         PushToken(THOUSAND);
     }else if(strncmp(height+1, "0", 1) != 0){
-        PushNumbers(phrase+1, 1);
+        PushNumbers(height+1, 1);
         PushToken(THOUSAND);
     }
 
@@ -351,12 +351,12 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
 
         case I_CLOUD:
             if(Matched(1)) PushToken(FEW);
-            else if(Matched(2)) PushToken(SCATTERED);
-            else if(Matched(3)) PushToken(BROKEN);
-            else if(Matched(4)) PushToken(OVERCAST);
+            if(Matched(2)) PushToken(SCATTERED);
+            if(Matched(3)) PushToken(BROKEN);
+            if(Matched(4)) PushToken(OVERCAST);
             PushHeight(Match(5));
             if(Matched(6)) PushToken(CUMULONIMBUS);
-            else if(Matched(7)) PushToken(TOWERING_CUMULUS);
+            if(Matched(7)) PushToken(TOWERING_CUMULUS);
             break;
 
         case I_NSC:
@@ -376,11 +376,11 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
         case I_TEMPERATURE:
             PushToken(TEMPERATURE);
             if(Matched(1)) PushToken(MINUS);
-            if(Matched(2)) PushNumbers(Match(2));
+            if(Matched(2)) PushNumbers(Match(2), 2);
             if(Matched(3)) PushToken(UNKNOWN);
             PushToken(DEWPOINT);
             if(Matched(4)) PushToken(MINUS);
-            if(Matched(5)) PushNumbers(Match(2));
+            if(Matched(5)) PushNumbers(Match(2), 2);
             if(Matched(6)) PushToken(UNKNOWN);
             break;
 
