@@ -285,6 +285,25 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_RVR:
+            PushDistance(RUNWAY);
+            PushNumbers(Match(1));
+            PushDistance(VISIBLE_RANGE);
+            if(Matched(2)){
+                PushToken(LESS_THAN);
+            }else if(Matched(3)){
+                PushToken(MORE_THAN);
+            }
+            PushDistance(Match(4));
+            if(Matched(5)){
+                PushToken(AND);
+                PushToken(INCREASING);
+            }else if(Matched(6)){
+                PushToken(AND);
+                PushToken(DECREASING);
+            }else if(Matched(7)){
+                PushToken(AND);
+                PushToken(REMAINING);
+            }
             break;
 
         case I_WEATHER:
