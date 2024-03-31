@@ -69,9 +69,10 @@ void playToken(TokenType token){
  * @return The raw JSON-formatted HTTP reponse body returned by ilmailusaa.fi 
  */
 void getMetar(char* response, int size_response){
-    BearSSL::WiFiClientSecure* client = new BearSSL::WiFiClientSecure();
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
     client->setInsecure();
     HTTPClient https;
+    https.setReuse(false);
 
     https.begin(*client, URL);
     int responseCode = https.GET();
@@ -86,7 +87,7 @@ void getMetar(char* response, int size_response){
     strncpy(response, https.getString().c_str(), size_response);
     response[size_response-1] = '\0';
     https.end();
-    delete client;
+    client.reset();
 
     D_println("Response:");
     D_println(response);
