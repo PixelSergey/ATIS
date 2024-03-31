@@ -209,6 +209,29 @@ void pushWeather(TokenType* phrase, int size_phrase, int& pos, const char* weath
     PushToken(TokenType(VICINITY + weather_index))
 }
 
+void pushHeight(TokenType* phrase, int size_phrase, int& pos, const char* height){
+    if(strncmp(height, "000", 3) == 0){
+        PushToken(ZERO);
+        PushToken(FEET);
+        return;
+    }
+
+    if(strncmp(height, "0", 1) != 0){
+        PushNumbers(phrase, 2);
+        PushToken(THOUSAND);
+    }else if(strncmp(height+1, "0", 1) != 0){
+        PushNumbers(phrase+1, 1);
+        PushToken(THOUSAND);
+    }
+
+    if(strncmp(height+2, "0", 1) != 0){
+        PushNumbers(height+2, 1);
+        PushToken(HUNDRED);
+    }
+
+    PushToken(FEET);
+}
+
 /**
  * Pushes a set of speech tokens to the end of a phrase depending on the METAR token type.
  * 
@@ -321,19 +344,27 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             if(Matched(2)){
                 PushToken(LIGHT);
             }
-
             for(int i=3; i<=5; i++){
                 if(Matched(i)) PushWeather(Match(i));
             }
             break;
 
         case I_CLOUD:
+            if(Matched(1)) PushToken(FEW);
+            else if(Matched(2)) PushToken(SCATTERED);
+            else if(Matched(3)) PushToken(BROKEN);
+            else if(Matched(4)) PushToken(OVERCAST);
+            PushHeight(Match(5));
+            if(Matched(6)) PushToken(CUMULONIMBUS);
+            else if(Matched(7)) PushToken(TOWERING_CUMULUS);
             break;
 
         case I_NSC:
+            PushToken(NO_SIGNIFICANT_CLOUD);
             break;
 
         case I_NCD:
+            PushToken(NO_CLOUD_DETECTED);
             break;
 
         case I_VERTICAL:

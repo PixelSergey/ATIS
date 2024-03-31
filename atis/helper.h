@@ -41,6 +41,7 @@
 #define PushChars(x, y) pushChars(phrase, size_phrase, pos, x, y);
 #define PushDistance(x) pushDistance(phrase, size_phrase, pos, x);
 #define PushWeather(x) pushWeather(phrase, size_phrase, pos, x);
+#define PushHeight(x) pushHeight(phrase, size_phrase, pos, x);
 #define Match(x) match.str(x).c_str()
 #define Matched(x) match[x].length()
 
@@ -197,7 +198,7 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"(\\\\\\/{4})|([0-9]{4})", I_VISIBILITY},
     {"R([0-9]{2})\\\\\\/(?:(M)|(P))?([0-9]{4})(?:(U)|(D)|(N))?", I_RVR},
     {"(\\+)?(\\-)?(VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)(VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?(VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?", I_WEATHER},
-    {"(FEW|SCT|BKN|OVC)([0-9]{3})(CB|TCU)?", I_CLOUD},
+    {"(?:(FEW)|(SCT)|(BKN)|(OVC))([0-9]{3})(?:(CB)|(TCU))?", I_CLOUD},
     {"NSC", I_NSC},
     {"NCD", I_NCD},
     {"VV([0-9]{3})", I_VERTICAL},
