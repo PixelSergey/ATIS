@@ -202,7 +202,7 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"NSC", I_NSC},
     {"NCD", I_NCD},
     {"VV([0-9]{3})", I_VERTICAL},
-    {"(?:(M)?([0-9]{2})|\\\\\\/{2})\\\\\\/(?:(M)?([0-9]{2})|\\\\\\/{2})", I_TEMPERATURE},
+    {"(?:(M)?([0-9]{2})|(\\\\\\/{2}))\\\\\\/(?:(M)?([0-9]{2})|(\\\\\\/{2}))", I_TEMPERATURE},
     {"Q(?:([0-9]{4})|\\\\\\/{4})", I_QNH},
     {"WS", I_WINDSHEAR},
     {"ALL", I_ALL},

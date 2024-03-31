@@ -374,6 +374,14 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_TEMPERATURE:
+            PushToken(TEMPERATURE);
+            if(Matched(1)) PushToken(MINUS);
+            if(Matched(2)) PushNumbers(Match(2));
+            if(Matched(3)) PushToken(UNKNOWN);
+            PushToken(DEWPOINT);
+            if(Matched(4)) PushToken(MINUS);
+            if(Matched(5)) PushNumbers(Match(2));
+            if(Matched(6)) PushToken(UNKNOWN);
             break;
 
         case I_QNH:
