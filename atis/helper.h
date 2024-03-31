@@ -40,6 +40,7 @@
 #define PushNumbers(x, y) pushNumbers(phrase, size_phrase, pos, x, y);
 #define PushChars(x, y) pushChars(phrase, size_phrase, pos, x, y);
 #define Match(x) match.str(x).c_str()
+#define Matched(x) match[x].length()
 
 // STL includes
 
@@ -81,6 +82,7 @@ enum TokenType {
     NO_WEATHER_INFORMATION,
     AUTOMATIC_WEATHER_REPORT,
     WIND,
+    CALM,
     VARIABLE,
     KNOTS,
     GUSTING,
@@ -187,7 +189,7 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"[0-9]{2}([0-9]{4})Z", I_TIME},
     {"NIL", I_NIL},
     {"AUTO", I_AUTO},
-    {"(?:(\\/{5})|(VRB|[0-9]{3})([0-9]{2})(?:G([0-9]{2}))?)KT", I_WIND},
+    {"(?:((?:\\\\\\/){5})|(00000)|(?:(VRB)|([0-9]{3}))([0-9]{2})(?:G([0-9]{2}))?)KT", I_WIND},
     {"([0-9]{3})V([0-9]{3})", I_VARIABLE},
     {"(\\/{4})|([0-9]{4})", I_VISIBILITY},
     {"R([0-9]{2})\\/([MP]?)([0-9]{4})([UDN]?)", I_RVR},

@@ -185,45 +185,93 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             PushToken(INFORMATION);
             PushToken(ALPHA);
             break;
+
         case I_TIME:
             PushToken(AT); PushToken(TIME);
             PushNumbers(Match(1), 4);
             PushToken(ZULU);
             break;
+
         case I_NIL:
-            break;
+            PushToken(NO_WEATHER_INFORMATION);
+
         case I_AUTO:
-            break;
+            PushToken(AUTOMATIC_WEATHER_REPORT);
+
         case I_WIND:
+            PushToken(WIND);
+            if(Matched(1)){
+                PushToken(UNKNOWN);
+                break;
+            }
+            if(Matched(2)){
+                PushToken(CALM);
+                break;
+            }
+            if(Matched(3)) PushToken(VARIABLE);
+            if(Matched(4)){
+                PushNumbers(Match(4), 3);
+                PushToken(DEGREES);
+            }
+            if(Matched(5)){
+                PushNumbers(Match(5), 2);
+                PushToken(KNOTS);
+            }
+            if(Matched(6)){
+                PushToken(GUSTING);
+                PushNumbers(Match(6), 2);
+                PushToken(KNOTS);
+            }
             break;
+
         case I_VARIABLE:
+            PushToken(VARIABLE);
+            PushToken(BETWEEN);
+            PushNumbers(Match(1));
+            PushToken(AND);
+            PushNumbers(Match(2));
+            PushToken(DEGREES);
             break;
+
         case I_VISIBILITY:
             break;
+
         case I_RVR:
             break;
+
         case I_WEATHER:
             break;
+
         case I_CLOUD:
             break;
+
         case I_NSC:
             break;
+
         case I_NCD:
             break;
+
         case I_VERTICAL:
             break;
+
         case I_TEMPERATURE:
             break;
+
         case I_QNH:
             break;
+
         case I_WINDSHEAR:
             break;
+
         case I_ALL:
             break;
+
         case I_RWY:
             break;
+
         case I_RUNWAY_NUMBER:
             break;
+
         default:
         case I_ERROR:
             break;
