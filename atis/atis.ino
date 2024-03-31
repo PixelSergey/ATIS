@@ -391,19 +391,25 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_WINDSHEAR:
+            PushToken(WINDSHEAR);
             break;
 
         case I_ALL:
+            PushToken(ALL);
             break;
 
         case I_RWY:
+            PushToken(RUNWAY);
             break;
 
         case I_RUNWAY_NUMBER:
+            PushToken(RUNWAY);
+            PushNumbers(Match(1), 2);
             break;
 
         default:
         case I_ERROR:
+            PushToken(ERROR);
             break;
     }
     return pos;
