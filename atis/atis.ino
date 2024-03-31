@@ -160,11 +160,11 @@ void pushToken(TokenType* phrase, int size_phrase, int& pos, TokenType token){
     pos++;
 }
 
-void pushNumbers(TokenType* phrase, int size_phrase, int& pos, char* numbers, int count){
+void pushNumbers(TokenType* phrase, int size_phrase, int& pos, const char* numbers, int count){
     for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(numbers[i]-48));  // Ascii 0 = Dec 48
 }
 
-void pushChars(TokenType* phrase, int size_phrase, int& pos, char* chars, int count){
+void pushChars(TokenType* phrase, int size_phrase, int& pos, const char* chars, int count){
     for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(chars[i]-55));  // Ascii A = Dec 65
 }
 
@@ -181,13 +181,13 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
     switch(type){
         case I_STATION:
             PushToken(THIS_IS);
-            //PushChars(match.str(1), 4);
+            PushChars(match.str(1).c_str(), 4);
             PushToken(INFORMATION);
             PushToken(ALPHA);
             break;
         case I_TIME:
             PushToken(AT); PushToken(TIME);
-            //PushNumbers(match.str(1), 4);
+            PushNumbers(match.str(1).c_str(), 4);
             PushToken(ZULU);
             break;
         case I_NIL:
