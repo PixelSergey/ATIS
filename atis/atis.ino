@@ -29,17 +29,17 @@ TokenType phrase[200];
  * @param length The length of the data array
  */
 void playMp3(const unsigned char* data, unsigned int length){
-    D_println("Setup");
+    D_print("Playing ");
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
     AudioGeneratorMP3* aud = new AudioGeneratorMP3();
     AudioFileSourcePROGMEM* clip = new AudioFileSourcePROGMEM(data, length);
 
-    D_println("Loop");
+    D_print("Looping ");
     aud->begin(clip, out);
     while(aud->loop());
     aud->stop();
 
-    D_println("Delet");
+    D_print("Deleting ");
 
     delete clip;
     delete aud;
@@ -118,7 +118,7 @@ int decodeMetar(char* metar, int size_metar, char* raw, int size_raw){
     int copied = end-begin-1;
     strncpy(metar, begin, copied);
     metar[copied] = '\0';
-    D_println("Decoded:");
+    D_print("Decoded: ");
     D_println(metar);
     return copied+1;
 }
@@ -141,7 +141,7 @@ int parseMetar(char** parsed, int size_parsed, char* metar, int size_metar){
         }
     }
 
-    D_println("Parsed");
+    D_print("Parsed: ");
     for(int i=0; i<j; i++){
         D_print(parsed[i]);
         D_print("|");
@@ -306,8 +306,12 @@ int generatePhrase(TokenType* phrase, int size_phrase, char** metar, int size_me
         pos = convertToken(phrase, size_phrase, pos, match, type);
     }
 
-    D_println("Phrase:");
-    for(int i=0; i<pos; i++) D_println(phrase[i]);
+    D_print("Phrase: ");
+    for(int i=0; i<pos; i++){
+        D_print(phrase[i]);
+        D_print(" ");
+    }
+    D_println();
     return pos;
 }
 
@@ -340,6 +344,7 @@ void setup(){
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     while(WiFi.status() != WL_CONNECTED) delay(100);
+    D_println("WiFi connected");
 
     // Turn off setup light
     digitalWrite(LED, LOW);
@@ -350,7 +355,8 @@ void setup(){
  */
 void loop(){
     int size_generated = getNewMetarPhrase(phrase, 200);
-    D_println("Done!!");
+    D_println("Generation complete!");
     for(int i=0; i<size_generated; i++) playToken(phrase[i]);
+    D_println("End of loop\n-----------------------\n");
     delay(2000);
 }
