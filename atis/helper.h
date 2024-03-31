@@ -39,6 +39,7 @@
 #define PushToken(x) pushToken(phrase, size_phrase, pos, x);
 #define PushNumbers(x, y) pushNumbers(phrase, size_phrase, pos, x, y);
 #define PushChars(x, y) pushChars(phrase, size_phrase, pos, x, y);
+#define Match(x) match.str(x).c_str()
 
 // STL includes
 
