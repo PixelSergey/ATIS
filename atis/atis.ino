@@ -169,6 +169,38 @@ void pushChars(TokenType* phrase, int size_phrase, int& pos, const char* chars, 
     for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(chars[i]-55));  // Ascii A = Dec 65
 }
 
+void pushDistance(TokenType* phrase, int size_phrase, int& pos, const char* distance){
+    if(strncmp(distance, "9999", 4) == 0){
+        PushToken(ONE);
+        PushToken(ZERO);
+        PushToken(KILOMETERS);
+        return;
+    }
+    if(strncmp(distance, "0000", 4) == 0){
+        PushToken(ZERO);
+        PushToken(METERS);
+        return;
+    }
+    if(strncmp(distance+1, "000", 3) == 0){
+        pushNumbers(phrase, size_phrase, pos, distance, 1);
+        PushToken(KILOMETERS);
+        return;
+    }
+    if(strncmp(distance+2, "00", 2) == 0){
+        if(strncmp(distance, "0", 1) != 0){
+            pushNumbers(phrase, size_phrase, pos, distance, 1);
+            PushToken(THOUSAND);
+        }
+        pushNumbers(phrase, size_phrase, pos, distance+1, 1);
+        PushToken(HUNDRED);
+        PushToken(METERS);
+        return;
+    }
+
+    pushNumbers(phrase, size_phrase, pos, distance, 4);
+    PushToken(METERS);
+}
+
 /**
  * Pushes a set of speech tokens to the end of a phrase depending on the METAR token type.
  * 
@@ -236,6 +268,14 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_VISIBILITY:
+            PushToken(VISIBILITY);
+            if(Matched(1)){
+                PushToken(UNKNOWN);
+                break;
+            }
+            if(Matched(2)){
+                PushDistance(Match(2));
+            }
             break;
 
         case I_RVR:

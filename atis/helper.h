@@ -39,6 +39,7 @@
 #define PushToken(x) pushToken(phrase, size_phrase, pos, x);
 #define PushNumbers(x, y) pushNumbers(phrase, size_phrase, pos, x, y);
 #define PushChars(x, y) pushChars(phrase, size_phrase, pos, x, y);
+#define PushDistance(x) pushDistance(phrase, size_phrase, pos, x);
 #define Match(x) match.str(x).c_str()
 #define Matched(x) match[x].length()
 
