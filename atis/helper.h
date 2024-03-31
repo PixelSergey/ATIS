@@ -34,6 +34,12 @@
     #define D_println(...)
 #endif
 
+// Shortcuts
+
+#define PushToken(x) pushToken(phrase, size_phrase, pos, x);
+#define PushNumbers(x, y) pushNumbers(phrase, size_phrase, pos, x, y);
+#define PushChars(x, y) pushChars(phrase, size_phrase, pos, x, y);
+
 // STL includes
 
 #include <string>
@@ -58,8 +64,8 @@
 // Enums
 
 enum TokenType {
-    ALPHA, BRAVO, CHARLIE, DELTA, ECHO, FOXTROT, GOLF, HOTEL, INDIA, JULIET, KILO, LIMA, MIKE, NOVEMBER, OSCAR, PAPA, QUEBEC, ROMEO, SIERRA, TANGO, UNIFORM, VICTOR, WHISKEY, XRAY, YANKEE, ZULU,
     ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINER,
+    ALPHA, BRAVO, CHARLIE, DELTA, ECHO, FOXTROT, GOLF, HOTEL, INDIA, JULIET, KILO, LIMA, MIKE, NOVEMBER, OSCAR, PAPA, QUEBEC, ROMEO, SIERRA, TANGO, UNIFORM, VICTOR, WHISKEY, XRAY, YANKEE, ZULU,
     THOUSAND,
     HUNDRED,
     FEET,
@@ -69,6 +75,8 @@ enum TokenType {
     KUMPULA,
     HYVINKAA,
     INFORMATION,
+    AT,
+    TIME,
     NO_WEATHER_INFORMATION,
     AUTOMATIC_WEATHER_REPORT,
     WIND,

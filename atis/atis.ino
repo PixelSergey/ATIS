@@ -150,6 +150,25 @@ int parseMetar(char** parsed, int size_parsed, char* metar, int size_metar){
     return j;
 }
 
+
+void pushToken(TokenType* phrase, int size_phrase, int& pos, TokenType token){
+    if(pos >= size_phrase){
+        pos = size_phrase;
+        return;
+    }
+    phrase[pos] = token;
+    pos++;
+}
+
+void pushNumbers(TokenType* phrase, int size_phrase, int& pos, char* numbers, int count){
+    for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(numbers[i]-48));  // Ascii 0 = Dec 48
+}
+
+void pushChars(TokenType* phrase, int size_phrase, int& pos, char* chars, int count){
+    for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(chars[i]-55));  // Ascii A = Dec 65
+}
+
+
 /**
  * Pushes a set of speech tokens to the end of a phrase depending on the METAR token type.
  * 
@@ -161,8 +180,15 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
     D_println("Converting");
     switch(type){
         case I_STATION:
-            if(pos>=size_phrase) return size_phrase; phrase[pos]=ALPHA; pos++;
+            PushToken(THIS_IS);
+            //PushChars(match.str(1), 4);
+            PushToken(INFORMATION);
+            PushToken(ALPHA);
+            break;
         case I_TIME:
+            PushToken(AT); PushToken(TIME);
+            //PushNumbers(match.str(1), 4);
+            PushToken(ZULU);
             break;
         case I_NIL:
             break;
