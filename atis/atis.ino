@@ -385,6 +385,9 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_QNH:
+            PushToken(QNH);
+            if(Matched(1)) PushNumbers(Match(1), 4);
+            if(Matched(2)) PushToken(UNKNOWN);
             break;
 
         case I_WINDSHEAR:
