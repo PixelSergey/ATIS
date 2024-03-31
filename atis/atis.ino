@@ -213,7 +213,13 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
     switch(type){
         case I_STATION:
             PushToken(THIS_IS);
-            PushChars(Match(1), 4);
+            if(Matched(1)){
+                PushToken(HYVINKAA);
+            }else if(Matched(2)){
+                PushToken(KUMPULA);
+            }else if(Matched(3)){
+                PushChars(Match(3), 4);
+            }
             PushToken(INFORMATION);
             PushToken(ALPHA);
             break;

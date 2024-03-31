@@ -186,7 +186,7 @@ constexpr std::pair<const unsigned char*, unsigned int> tokenToAudio[] = {
 
 // This map must be updated if the METAR standard changes or bugs are found
 constexpr std::pair<const char*, InformationType> regexToToken[] = {
-    {"(IL..|EF..)", I_STATION},
+    {"(ILZM)|(ILZD)|(IL[A-Z]{2}|EF[A-Z]{2})", I_STATION},
     {"[0-9]{2}([0-9]{4})Z", I_TIME},
     {"NIL", I_NIL},
     {"AUTO", I_AUTO},
