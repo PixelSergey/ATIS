@@ -40,6 +40,7 @@
 #define PushNumbers(x, y) pushNumbers(phrase, size_phrase, pos, x, y);
 #define PushChars(x, y) pushChars(phrase, size_phrase, pos, x, y);
 #define PushDistance(x) pushDistance(phrase, size_phrase, pos, x);
+#define PushWeather(x) pushWeather(phrase, size_phrase, pos, x);
 #define Match(x) match.str(x).c_str()
 #define Matched(x) match[x].length()
 
@@ -195,7 +196,7 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"CAVOK", I_CAVOK},
     {"(\\\\\\/{4})|([0-9]{4})", I_VISIBILITY},
     {"R([0-9]{2})\\\\\\/(?:(M)|(P))?([0-9]{4})(?:(U)|(D)|(N))?", I_RVR},
-    {"(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?(\\+|-|VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?", I_WEATHER},
+    {"(\\+)?(\\-)?(VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)(VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?(VC|RE|MI|BC|PR|DR|BL|SH|TS|FZ|DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)?", I_WEATHER},
     {"(FEW|SCT|BKN|OVC)([0-9]{3})(CB|TCU)?", I_CLOUD},
     {"NSC", I_NSC},
     {"NCD", I_NCD},
@@ -206,6 +207,39 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"ALL", I_ALL},
     {"RWY", I_RWY},
     {"R([0-9]{2})", I_RUNWAY_NUMBER},
+};
+
+constexpr int weatherType[] = {
+    17238,
+    17746,
+    18765,
+    17218,
+    21072,
+    21060,
+    19522,
+    18515,
+    21332,
+    23110,
+    23108,
+    16722,
+    20051,
+    18259,
+    19536,
+    21063,
+    21319,
+    20565,
+    21058,
+    18246,
+    21830,
+    16726,
+    21828,
+    16723,
+    23112,
+    20304,
+    20819,
+    17222,
+    21331,
+    21316,
 };
 
 #endif

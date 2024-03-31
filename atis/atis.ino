@@ -162,11 +162,11 @@ void pushToken(TokenType* phrase, int size_phrase, int& pos, TokenType token){
 }
 
 void pushNumbers(TokenType* phrase, int size_phrase, int& pos, const char* numbers, int count){
-    for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(numbers[i]-48));  // Ascii 0 = Dec 48
+    for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(numbers[i]-'0'+ZERO));
 }
 
 void pushChars(TokenType* phrase, int size_phrase, int& pos, const char* chars, int count){
-    for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(chars[i]-55));  // Ascii A = Dec 65
+    for(int i=0; i<count; i++) pushToken(phrase, size_phrase, pos, TokenType(chars[i]-'A'+ALPHA));
 }
 
 void pushDistance(TokenType* phrase, int size_phrase, int& pos, const char* distance){
@@ -199,6 +199,14 @@ void pushDistance(TokenType* phrase, int size_phrase, int& pos, const char* dist
 
     pushNumbers(phrase, size_phrase, pos, distance, 4);
     PushToken(METERS);
+}
+
+void pushWeather(TokenType* phrase, int size_phrase, int& pos, const char* weather){
+    const int value = weather[0] | (weather[1] << 8);
+    int len = sizeof(weatherType)/sizeof(int);
+    int weather_index = std::find(weatherType, weatherType+len, value) - weatherType;
+    if(weather_index >= len) return;
+    PushToken(TokenType(VICINITY + weather_index))
 }
 
 /**
@@ -285,9 +293,9 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_RVR:
-            PushDistance(RUNWAY);
-            PushNumbers(Match(1));
-            PushDistance(VISIBLE_RANGE);
+            PushToken(RUNWAY);
+            PushNumbers(Match(1), 2);
+            PushToken(VISIBLE_RANGE);
             if(Matched(2)){
                 PushToken(LESS_THAN);
             }else if(Matched(3)){
@@ -307,6 +315,16 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             break;
 
         case I_WEATHER:
+            if(Matched(1)){
+                PushToken(HEAVY);
+            }
+            if(Matched(2)){
+                PushToken(LIGHT);
+            }
+
+            for(int i=3; i<=5; i++){
+                if(Matched(i)) PushWeather(Match(i));
+            }
             break;
 
         case I_CLOUD:
