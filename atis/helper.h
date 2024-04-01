@@ -1,7 +1,7 @@
 /**
  * ATIS helper file. This file contains includes and other practical
  * defines that would clutter up the main atis.ino file.
- * Copyright (C) 2023 PixelSergey
+ * Copyright (C) 2023-2024 PixelSergey
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,13 @@
 #ifndef ATIS_HELPER
 #define ATIS_HELPER
 
+#include "config.h"
+#include "audio.h"
+
 // Enable or disable debug printing and serial features
 
 #if DEBUG
+    #include <Arduino.h>
     #define D_SerialBegin(...)  Serial.begin(__VA_ARGS__)
     #define D_print(...)        Serial.print(__VA_ARGS__)
     #define D_write(...)        Serial.write(__VA_ARGS__)
@@ -44,27 +48,6 @@
 #define PushHeight(x) pushHeight(phrase, size_phrase, pos, x);
 #define Match(x) match.str(x).c_str()
 #define Matched(x) match[x].length()
-
-// STL includes
-
-#include <string>
-#include <vector>
-#include <regex>
-
-// Arduino library includes
-
-#include <Arduino.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
-#include <WiFiClientSecureBearSSL.h>
-
-#include "AudioFileSourcePROGMEM.h"
-#include "AudioGeneratorMP3.h"
-#include "AudioOutputI2SNoDAC.h"
-
-// Audio include
-
-#include "audio.h"
 
 // Enums
 
