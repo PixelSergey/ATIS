@@ -20,8 +20,8 @@ The second is to install this app on your NodeMCU!
 1. Build the circuit as shown on the diagrams below
 1. Install the [Arduino IDE](https://www.arduino.cc/en/main/software) and optionally set up a development environment in Visual Studio Code
 1. Install the [NodeMCU Add-On](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/)
-1. Run `./encode.sh` to encode the default voice pack
-    - You can also specify a voice pack by running `./encode.sh <name>`
+1. Run `python3 encode.py` to encode the default voice pack
+    - You can also specify a voice pack by running `python3 encode.py <name>`
     - Currently available voice packs: `female`, `male`
 1. Connect your NodeMCU to your computer via USB and upload the code
 
