@@ -68,6 +68,8 @@
 
 // Enums
 
+// This enum contains all the possible speech tokens
+// Must be updated if the METAR standard changes or bugs are found
 enum TokenType {
     ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINER,
     ALPHA, BRAVO, CHARLIE, DELTA, ECHO, FOXTROT, GOLF, HOTEL, INDIA, JULIET, KILO, LIMA, MIKE, NOVEMBER, OSCAR, PAPA, QUEBEC, ROMEO, SIERRA, TANGO, UNIFORM, VICTOR, WHISKEY, XRAY, YANKEE, ZULU,
@@ -154,7 +156,7 @@ enum TokenType {
     DUST_STORM,
 };
 
-// This enum contains all the possible METAR tokens
+// This enum contains all the possible METAR information types
 // Must be updated if the METAR standard changes or bugs are found
 enum InformationType {
     I_STATION,
@@ -180,15 +182,16 @@ enum InformationType {
     I_ERROR,
 };
 
-// This map must be updated if audio files are added or removed
-
+// This array contains the audio data locations in the same order as the speech tokens in TokenType
+// Must be updated if audio files are added or removed
 constexpr std::pair<const unsigned char*, unsigned int> tokenToAudio[] = {
     {A_mp3, A_mp3_len},
     {B_mp3, B_mp3_len},
     {C_mp3, C_mp3_len},
 };
 
-// This map must be updated if the METAR standard changes or bugs are found
+// This array contains all of the regex clauses used to decode the METAR information
+// Must be updated if the METAR standard changes or bugs are found
 constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"(ILZM)|(ILZD)|(IL[A-Z]{2}|EF[A-Z]{2})", I_STATION},
     {"[0-9]{2}([0-9]{4})Z", I_TIME},
@@ -212,6 +215,8 @@ constexpr std::pair<const char*, InformationType> regexToToken[] = {
     {"((?:\\\\\\/){2})|(\\+)?(-)?((?:[A-Z]{2}){1,3})", I_WEATHER},
 };
 
+// This array contains all of the possible weather types for the I_WEATHER information type
+// Must be updated if new weather types are added
 constexpr int weatherType[] = {
     17238,
     17746,
