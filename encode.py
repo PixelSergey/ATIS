@@ -46,15 +46,15 @@ tempate = """/**
 #ifndef ATIS_AUDIO
 #define ATIS_AUDIO
 
-const unsigned int audioDataLengths[] PROGMEM = {{
+constexpr unsigned int audioDataLengths[] PROGMEM = {{
 {lengths}
 }};
 
-const unsigned int audioDataOffsets[] PROGMEM = {{
+constexpr unsigned int audioDataOffsets[] PROGMEM = {{
 {offsets}
 }};
 
-const unsigned char audioDataMp3[] PROGMEM = {{
+constexpr unsigned char audioDataMp3[] PROGMEM = {{
 {audio_data}
 }};
 
