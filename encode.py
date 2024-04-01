@@ -90,7 +90,7 @@ offsets = [sum(lengths[:i]) for i,_ in enumerate(lengths)]  # Could be optimised
 lengthstring = "\n".join([str(length)+"," for length in lengths])
 offsetstring = "\n".join([str(offset)+"," for offset in offsets])
 
-datadump = [hex(char)+"," for char in  b''.join(audiodata)]
+datadump = [f"0x{char:02x}, " for char in  b''.join(audiodata)]
 datasplit = [''.join(datadump[32*i:32*(i+1)]) for i in range(math.ceil(len(datadump)/32))]
 datastring = "\n".join(datasplit)
 
