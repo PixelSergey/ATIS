@@ -40,9 +40,9 @@ void playMp3(const unsigned char* data, unsigned int length){
 }
 
 void playToken(TokenType token){
-    if(token >= std::size(tokenToAudio)) return;
-
-    const unsigned char* data = tokenToAudio[token].first;
-    unsigned int length = tokenToAudio[token].second;
+    if(token > 9) return;
+    unsigned int offset = audioDataOffsets[token];
+    const unsigned char* data = audioDataMp3 + offset;
+    unsigned int length = audioDataLengths[token];
     playMp3(data, length);
 }

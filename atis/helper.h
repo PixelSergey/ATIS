@@ -165,14 +165,6 @@ enum InformationType {
     I_ERROR,
 };
 
-// This array contains the audio data locations in the same order as the speech tokens in TokenType
-// Must be updated if audio files are added or removed
-constexpr std::pair<const unsigned char*, unsigned int> tokenToAudio[] = {
-    {A_mp3, A_mp3_len},
-    {B_mp3, B_mp3_len},
-    {C_mp3, C_mp3_len},
-};
-
 // This array contains all of the regex clauses used to decode the METAR information
 // Must be updated if the METAR standard changes or bugs are found
 constexpr std::pair<const char*, InformationType> regexToToken[] = {
