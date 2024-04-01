@@ -40,7 +40,7 @@ void playMp3(const unsigned char* data, unsigned int length){
 }
 
 void playToken(TokenType token){
-    if(token > 9) return;
+    if(token > 35) return;
     unsigned int offset = audioDataOffsets[token];
     const unsigned char* data = audioDataMp3 + offset;
     unsigned int length = audioDataLengths[token];
