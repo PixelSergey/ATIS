@@ -50,7 +50,8 @@ void setup(){
 void loop(){
     int size_generated = getNewMetarPhrase(phrase, SIZE_PHRASE);
     D_println("Generation complete!");
-    for(int i=0; i<size_generated; i++) playToken(phrase[i]);
+    //for(int i=0; i<size_generated; i++) playToken(phrase[i]);
+    for(int i=0; i<36; i++) playToken(TokenType(i));
     D_println("End of loop\n-----------------------\n");
     delay(2000);
 }
