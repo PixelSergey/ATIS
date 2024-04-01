@@ -201,12 +201,14 @@ void pushDistance(TokenType* phrase, int size_phrase, int& pos, const char* dist
     PushToken(METERS);
 }
 
-void pushWeather(TokenType* phrase, int size_phrase, int& pos, const char* weather){
-    const int value = weather[0] | (weather[1] << 8);
+void pushWeather(TokenType* phrase, int size_phrase, int& pos, const char* weather, int length){
     int len = sizeof(weatherType)/sizeof(int);
-    int weather_index = std::find(weatherType, weatherType+len, value) - weatherType;
-    if(weather_index >= len) return;
-    PushToken(TokenType(VICINITY + weather_index))
+    for(int i=0; 2*i<length; i++){
+        const int value = weather[2*i] | (weather[2*i+1] << 8);
+        int weather_index = std::find(weatherType, weatherType+len, value) - weatherType;
+        if(weather_index >= len) continue;
+        PushToken(TokenType(VICINITY + weather_index))
+    }
 }
 
 void pushHeight(TokenType* phrase, int size_phrase, int& pos, const char* height){
@@ -304,6 +306,10 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             PushToken(DEGREES);
             break;
 
+        case I_CAVOK:
+            PushToken(CAVOK);
+            break;
+
         case I_VISIBILITY:
             PushToken(VISIBILITY);
             if(Matched(1)){
@@ -339,24 +345,34 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
 
         case I_WEATHER:
             if(Matched(1)){
-                PushToken(HEAVY);
+                PushToken(WEATHER);
+                PushToken(UNKNOWN);
+                break;
             }
-            if(Matched(2)){
-                PushToken(LIGHT);
-            }
-            for(int i=3; i<=5; i++){
-                if(Matched(i)) PushWeather(Match(i));
-            }
+            if(Matched(2)) PushToken(HEAVY);
+            if(Matched(3)) PushToken(LIGHT);
+            if(Matched(4)) PushWeather(Match(4), Matched(4));
             break;
 
         case I_CLOUD:
-            if(Matched(1)) PushToken(FEW);
-            if(Matched(2)) PushToken(SCATTERED);
-            if(Matched(3)) PushToken(BROKEN);
-            if(Matched(4)) PushToken(OVERCAST);
-            PushHeight(Match(5));
-            if(Matched(6)) PushToken(CUMULONIMBUS);
-            if(Matched(7)) PushToken(TOWERING_CUMULUS);
+            if(Matched(1)){
+                if(!Matched(7) && !Matched(8)){
+                    PushToken(CLOUDS);
+                    PushToken(UNKNOWN);
+                    break;
+                }
+                if(Matched(7)) PushToken(CUMULONIMBUS);
+                if(Matched(8)) PushToken(TOWERING_CUMULUS);
+                PushToken(CLOUDS);
+                break;
+            }
+            if(Matched(2)) PushToken(FEW);
+            if(Matched(3)) PushToken(SCATTERED);
+            if(Matched(4)) PushToken(BROKEN);
+            if(Matched(5)) PushToken(OVERCAST);
+            if(Matched(6)) PushHeight(Match(6));
+            if(Matched(7)) PushToken(CUMULONIMBUS);
+            if(Matched(8)) PushToken(TOWERING_CUMULUS);
             break;
 
         case I_NSC:
@@ -380,7 +396,7 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             if(Matched(3)) PushToken(UNKNOWN);
             PushToken(DEWPOINT);
             if(Matched(4)) PushToken(MINUS);
-            if(Matched(5)) PushNumbers(Match(2), 2);
+            if(Matched(5)) PushNumbers(Match(5), 2);
             if(Matched(6)) PushToken(UNKNOWN);
             break;
 
