@@ -23,14 +23,12 @@
 #include <SPI.h>
 #include <SD.h>
 
-#include "audio.h"
 #include "config.h"
 #include "helper.h"
 
 #include "player.h"
 #include "networking.h"
 #include "parser.h"
-#include "file.h"
 
 /**
  * @brief Downloads the current METAR information, processes it, and converts it into an array of tokens.

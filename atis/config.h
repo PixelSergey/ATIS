@@ -31,6 +31,7 @@
 #define PIN_LED D2
 #define PIN_CS D1
 #define URL "https://ilmailusaa.fi/backend.php?{%22mode%22:%22awsaviation%22,%22radius%22:%22100%22,%22points%22:[{%22_locationName%22:%22ILZM%22}]}"
+#define VOICEPACK "female"
 
 #define WIFI_SSID "SSID"
 #define WIFI_PASSWORD "PASSWORD"

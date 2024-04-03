@@ -19,11 +19,11 @@
 
 #include "player.h"
 
-void playMp3(const unsigned char* data, unsigned int length){
+void playMp3(char* path){
     D_print("Playing ");
     AudioOutputI2SNoDAC* out = new AudioOutputI2SNoDAC();
     AudioGeneratorMP3* aud = new AudioGeneratorMP3();
-    AudioFileSourcePROGMEM* clip = new AudioFileSourcePROGMEM(data, length);
+    AudioFileSourceSD* clip = new AudioFileSourceSD(path);
 
     D_print("Looping ");
     aud->begin(clip, out);
@@ -40,9 +40,9 @@ void playMp3(const unsigned char* data, unsigned int length){
 }
 
 void playToken(TokenType token){
-    if(token > 35) return;
-    unsigned int offset = audioDataOffsets[token];
-    const unsigned char* data = audioDataMp3 + offset;
-    unsigned int length = audioDataLengths[token];
-    playMp3(data, length);
+    char path[20+sizeof(VOICEPACK)];
+    sprintf(path, "/audio/" VOICEPACK "/%ld.mp3", token);
+    if(!SD.exists(path)) return;
+
+    playMp3(path);
 }

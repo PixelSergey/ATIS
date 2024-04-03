@@ -21,7 +21,6 @@
 #define ATIS_HELPER
 
 #include "config.h"
-#include "audio.h"
 
 // Enable or disable debug printing and serial features
 
