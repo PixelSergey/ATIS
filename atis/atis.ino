@@ -33,9 +33,14 @@ int getNewMetarPhrase(TokenType* phrase, int size_phrase){
 
 void setup(){
     // Pin setup
-    pinMode(LED, OUTPUT);
-    digitalWrite(LED, HIGH);  // Turn on setup light
+    pinMode(PIN_LED, OUTPUT);
+    digitalWrite(PIN_LED, HIGH);  // Turn on setup light
     D_SerialBegin(115200);
+
+    if (!SD.begin(PIN_CS)){
+        D_println("SD initialisation failed");
+        return;
+    }
 
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -44,7 +49,7 @@ void setup(){
     D_println("WiFi connected");
 
     // Turn off setup light
-    digitalWrite(LED, LOW);
+    digitalWrite(PIN_LED, LOW);
 }
 
 void loop(){
