@@ -39,7 +39,6 @@ void setup(){
 
     if (!SD.begin(PIN_CS)){
         D_println("SD initialisation failed");
-        return;
     }
 
     WiFi.mode(WIFI_STA);
@@ -56,7 +55,7 @@ void loop(){
     int size_generated = getNewMetarPhrase(phrase, SIZE_PHRASE);
     D_println("Generation complete!");
     //for(int i=0; i<size_generated; i++) playToken(phrase[i]);
-    for(int i=0; i<36; i++) playToken(TokenType(i));
+    for(int i=0; i<117; i++) playToken(TokenType(i));
     D_println("End of loop\n-----------------------\n");
     delay(2000);
 }
