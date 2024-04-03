@@ -39,9 +39,9 @@ void playMp3(char* path){
     D_println("Exiting");
 }
 
-void playToken(TokenType token){
+void playToken(TokenType token, char* voicepack){
     char path[100];
-    sprintf(path, "/audio/" VOICEPACK "/%s.mp3", tokenFilenames[token]);
+    snprintf(path, 100, "/audio/%s/%s.mp3", voicepack, tokenFilenames[token]);
     if(!SD.exists(path)) return;
 
     playMp3(path);

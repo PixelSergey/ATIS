@@ -38,7 +38,8 @@ void playMp3(char* path);
  * All available token names can be found in the TokenType enum in `helper.h`.
  * 
  * @param[in] token The token to play
+ * @param[in] voicepack A pointer to a character array with the voicepack name
  */
-void playToken(TokenType token);
+void playToken(TokenType token, char* voicepack);
 
 #endif
