@@ -60,6 +60,8 @@ void setup(){
     // Pin setup
     pinMode(PIN_LED, OUTPUT);
     digitalWrite(PIN_LED, HIGH);  // Turn on setup light
+    pinMode(PIN_BUTTON, INPUT_PULLUP);
+
     D_SerialBegin(115200);
     D_println();
 
@@ -90,10 +92,13 @@ void setup(){
 }
 
 void loop(){
+    if(digitalRead(PIN_BUTTON) == HIGH) return;
+
+    digitalWrite(PIN_LED, HIGH);
     int size_generated = getNewMetarPhrase(phrase, SIZE_PHRASE);
     D_println("Generation complete!");
     //for(int i=0; i<size_generated; i++) playToken(phrase[i]);
     for(int i=0; i<117; i++) playToken(TokenType(i), voicepack);
     D_println("End of loop\n-----------------------\n");
-    delay(2000);
+    digitalWrite(PIN_LED, LOW);
 }
