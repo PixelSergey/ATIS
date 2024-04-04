@@ -21,8 +21,6 @@
 TokenType phrase[SIZE_PHRASE];
 char voicepack[SIZE_VOICEPACK];
 char url[SIZE_URL];
-char ssid[SIZE_SSID];
-char password[SIZE_PASSWORD];
 
 int getNewMetarPhrase(TokenType* phrase, int size_phrase){
     char response[SIZE_RESPONSE];
@@ -46,13 +44,14 @@ void loadConfig(char* target, int size_target, const char* defaultText, const ch
             config.close();
             if(read > 0){
                 snprintf(target, min(read+1, size_target), "%s", data);
+                for(int i=0; i<size_target; i++) if(target[i]=='\n' || target[i]=='\t') target[i]='\0';
                 configSuccess = true; 
             }
         }
     }
     
     if(!configSuccess){
-        strncpy(voicepack, defaultText, SIZE_VOICEPACK);
+        strncpy(target, defaultText, size_target);
     }
 }
 
@@ -70,6 +69,9 @@ void setup(){
     }else{
         D_println("SD initialised");
     }
+
+    char ssid[SIZE_SSID];
+    char password[SIZE_PASSWORD];
 
     loadConfig(voicepack, SIZE_VOICEPACK, VOICEPACK, PATH_VOICEPACK);
     loadConfig(url, SIZE_URL, URL, PATH_URL);

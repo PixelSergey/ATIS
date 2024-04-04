@@ -25,7 +25,7 @@ void getMetar(char* response, int size_response, const char* url){
     HTTPClient https;
     https.setReuse(false);
 
-    https.begin(*client, url);
+    https.begin(*client, String(url));
     int responseCode = https.GET();
 
     if(responseCode <= 0){
