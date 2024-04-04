@@ -99,7 +99,7 @@ void loop(){
     digitalWrite(PIN_LED, HIGH);
     int size_generated = getNewMetarPhrase(phrase, SIZE_PHRASE);
     D_println("Generation complete!");
-    //for(int i=0; i<size_generated; i++) playToken(phrase[i]);
+    //for(int i=0; i<size_generated; i++) playToken(phrase[i], voicepack);
     for(int i=0; i<117; i++) playToken(TokenType(i), voicepack);
     D_println("End of loop\n-----------------------\n");
     digitalWrite(PIN_LED, LOW);

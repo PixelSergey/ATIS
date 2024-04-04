@@ -99,6 +99,14 @@ void pushHeight(TokenType* phrase, int size_phrase, int& pos, const char* height
 int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match, InformationType type);
 
 /**
+ * @brief Gets the current information letter based on the time of the METAR information
+ * 
+ * @param[in] time The 4-character time value from the METAR information
+ * @return The TokenType value for the current information letter
+*/
+TokenType getInformationLetter(const char* time);
+
+/**
  * @brief Transforms the split METAR information output by `parseMetar()` into a list of tokens to be played on the speaker based on the METAR standard.
  * The official METAR standard can be found at https://ilmailusaa.fi/pdf/Saahaitari_01-2021.pdf.
  * 

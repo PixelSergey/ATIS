@@ -19,6 +19,9 @@
 
 #include "parser.h"
 
+TokenType informationLetter;
+int lastTime = 0;
+
 void pushToken(TokenType* phrase, int size_phrase, int& pos, TokenType token){
     if(pos >= size_phrase){
         pos = size_phrase;
@@ -103,6 +106,21 @@ void pushHeight(TokenType* phrase, int size_phrase, int& pos, const char* height
     PushToken(FEET);
 }
 
+TokenType getInformationLetter(const char* time){
+    if(lastTime == 0){
+        informationLetter = TokenType(random(ALPHA, ZULU+1));
+        return informationLetter;
+    }
+
+    int currentTime = time[0] | (time[1] << 8) | (time[2] << 16) | (time[3] << 24);
+    if(currentTime == lastTime) return informationLetter;
+    
+    lastTime = currentTime;
+    informationLetter = TokenType(informationLetter+1);
+    if(informationLetter > ZULU) informationLetter = ALPHA;
+    return informationLetter;
+}
+
 int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match, InformationType type){
     D_println("Converting");
     switch(type){
@@ -115,11 +133,12 @@ int convertToken(TokenType* phrase, int size_phrase, int pos, std::cmatch& match
             }else if(Matched(3)){
                 PushChars(Match(3), 4);
             }
-            PushToken(INFORMATION);
-            PushToken(ALPHA);
             break;
 
         case I_TIME:
+            PushToken(INFORMATION);
+            PushToken(getInformationLetter(Match(1)));
+
             PushToken(AT); PushToken(TIME);
             PushNumbers(Match(1), 4);
             PushToken(ZULU);
