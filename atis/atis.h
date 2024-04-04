@@ -40,6 +40,16 @@
 int getNewMetarPhrase(TokenType* phrase, int size_phrase);
 
 /**
+ * @brief Loads a config file to a location in memory
+ * 
+ * @param[out] target A pointer to a character array where the data will be written
+ * @param[in] size_target The size of `target`
+ * @param[in] defaultText A pointer to a character array with the data to write if the SD card is inaccessible
+ * @param[in] filepath A pointer to a character array with the path to the file
+*/
+void loadConfig(char* target, int size_target, const char* defaultText, const char* filepath);
+
+/**
  * @brief Sets up the NodeMCU's pins and WiFi connectivity.
  */
 void setup();

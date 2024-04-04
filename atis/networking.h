@@ -28,12 +28,12 @@
 
 /**
  * @brief Downloads the METAR information from ilmailusaa.fi.
- * The precise URL is defined in the URL variable in `config.h`.
  * 
  * @param[out] response A pointer to a char array, where the raw JSON-formatted data from ilmailusaa.fi will be written
  * @param[in] size_response The maximum size of the `response` array
+ * @param[in] url A pointer to a char array where the URL is located
  */
-void getMetar(char* response, int size_response);
+void getMetar(char* response, int size_response, const char* url);
 
 /**
  * @brief Decodes the raw METAR information obtained from `getMetar()`.

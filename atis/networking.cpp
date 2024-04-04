@@ -19,13 +19,13 @@
 
 #include "networking.h"
 
-void getMetar(char* response, int size_response){
+void getMetar(char* response, int size_response, const char* url){
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
     client->setInsecure();
     HTTPClient https;
     https.setReuse(false);
 
-    https.begin(*client, URL);
+    https.begin(*client, url);
     int responseCode = https.GET();
 
     if(responseCode <= 0){

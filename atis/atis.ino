@@ -20,16 +20,40 @@
 
 TokenType phrase[SIZE_PHRASE];
 char voicepack[SIZE_VOICEPACK];
+char url[SIZE_URL];
+char ssid[SIZE_SSID];
+char password[SIZE_PASSWORD];
 
 int getNewMetarPhrase(TokenType* phrase, int size_phrase){
     char response[SIZE_RESPONSE];
     char metar[SIZE_METAR];
     char* parsed[SIZE_PARSED];
-    getMetar(response, SIZE_RESPONSE);
+    getMetar(response, SIZE_RESPONSE, url);
     int size_metar = decodeMetar(metar, SIZE_METAR, response, SIZE_RESPONSE);
     int size_parsed = parseMetar(parsed, SIZE_PARSED, metar, size_metar);
     int size_generated = generatePhrase(phrase, size_phrase, parsed, size_parsed);
     return size_generated;
+}
+
+void loadConfig(char* target, int size_target, const char* defaultText, const char* filepath){
+    bool configSuccess = false;
+
+    if(SD.exists(filepath)){
+        File config = SD.open(filepath, FILE_READ);
+        if(config){
+            unsigned char data[size_target];
+            int read = config.read(data, size_target);
+            config.close();
+            if(read > 0){
+                snprintf(target, min(read+1, size_target), "%s", data);
+                configSuccess = true; 
+            }
+        }
+    }
+    
+    if(!configSuccess){
+        strncpy(voicepack, defaultText, SIZE_VOICEPACK);
+    }
 }
 
 void setup(){
@@ -41,31 +65,22 @@ void setup(){
 
     if (!SD.begin(PIN_CS)){
         D_println("SD initialisation failed");
+    }else{
+        D_println("SD initialised");
     }
-    D_println("SD initialised");
 
-    bool configSuccess = false;
-    if(SD.exists(PATH_CONFIG)){
-        File config = SD.open(PATH_CONFIG, FILE_READ);
-        if(config){
-            unsigned char data[SIZE_VOICEPACK];
-            int read = config.read(data, SIZE_VOICEPACK);
-            config.close();
-            if(read > 0){
-                snprintf(voicepack, min(read+1, SIZE_VOICEPACK), "%s", data);
-                configSuccess = true; 
-            }
-        }
-    }
-    
-    if(!configSuccess){
-        strncpy(voicepack, VOICEPACK, SIZE_VOICEPACK);
-    }
+    loadConfig(voicepack, SIZE_VOICEPACK, VOICEPACK, PATH_VOICEPACK);
+    loadConfig(url, SIZE_URL, URL, PATH_URL);
+    loadConfig(ssid, SIZE_SSID, WIFI_SSID, PATH_SSID);
+    loadConfig(password, SIZE_PASSWORD, WIFI_PASSWORD, PATH_PASSWORD);
 
     D_print("Voicepack in use: "); D_println(voicepack);
+    D_print("URL in use: "); D_println(url);
+    D_print("WiFi SSID in use: "); D_println(ssid);
+    D_print("WiFi password in use: "); D_println(password);
 
     WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    WiFi.begin(ssid, password);
 
     while(WiFi.status() != WL_CONNECTED) delay(100);
     D_println("WiFi connected");
