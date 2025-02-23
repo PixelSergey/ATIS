@@ -27,13 +27,17 @@ The second is to install this app on your NodeMCU!
 
 ## Circuit
 
-The circuit contains a NodeMCU, a speaker module, and an LED.
-The speaker module is connected to +5V, and is wired to the RX port of the NodeMCU and GND via an NPN transistor.
+The circuit contains a NodeMCU, a speaker module, an SD card module, a few buttons, and an LED.
+
+- The speaker module is connected to +5V, and is wired to the RX port of the NodeMCU and GND via an NPN transistor.
 The RX port is used by the `AudioOutputI2SNoDAC` library to output sound.
+- The SD card module is wired up directly with the following pins connected together:
+  - CS <-> D1
+  - SCK <-> D5
+  - MOSI <-> D6
+  - MISO <-> D7
 
-![Breadboard diagram](/meta/ATIS_bb.png)
-
-![Schematic diagram](/meta/ATIS_schem.png)
+![Schematic diagram](/meta/atis.svg)
 
 ## Credits
 
